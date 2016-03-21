@@ -6,6 +6,7 @@ class Items
     mauer: {file: 'wall.png' },
     stein: {file: 'rock.png' },
     burg: {file: 'castle.png' },
+    schatz: {file: 'treasure.png'}
   }
 
   def initialize
