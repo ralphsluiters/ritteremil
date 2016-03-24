@@ -6,12 +6,18 @@ class Player
 
 
   def initialize(level)
+    @sound_dig = Gosu::Sample.new("media/dig.mp3")
+    @sound_wall = Gosu::Sample.new("media/wall.mp3")
+    @sound_ziel = Gosu::Sample.new("media/ziel.mp3")
+    @sound_schatz = Gosu::Sample.new("media/treasure.mp3")
+
     @image = Gosu::Image.new("media/items/knight.png")
     @x, @y = level.hero_start_position
     @score = 0
     @level = level
     @gewonnen = @verloren = false
   end
+
 
   def try_move(direction)
     x = @x ; y = @y
@@ -25,14 +31,34 @@ class Player
     when :right
       x+= 1
     end
-    result = @level.status(x,y,self)
-   # puts "x: #{@x}, y: #{@y}  versuch x: #{x}, y: #{y}, result: #{result}"
-    if result == :frei
+
+    case @level.value(x,y)
+    when :mauer
+      @sound_wall.play
+    when :burg
+      @sound_ziel.play
+      @gewonnen = true
+    when :stein
+      if @level.try_push(x,y,direction, :stein)
+        @x=x;@y=y
+        @level.clean_position(x,y)
+      end
+    when :ork
+      die!
+    when :lava
+      die!
+    when :schatz
+      @sound_schatz.play
+      @score +=100
       @x=x;@y=y
       @level.clean_position(x,y)
-    end
-    if result == :gewonnen
-      @gewonnen = true
+    when :erde
+      @sound_dig.play
+      @x=x;@y=y
+      @level.clean_position(x,y)
+    else
+      @x=x;@y=y
+      @level.clean_position(x,y)
     end
   end
 
