@@ -1,0 +1,8 @@
+{
+  "name" : "Klein...",
+  "karte": [["mauer","mauer","mauer","erde" ,"erde" ,"mauer","mauer","mauer","mauer"],
+            ["mauer","hero","erde"  ,"erde" ,"erde" ,"erde" ,"erde" ,"erde" ,"mauer"],
+            ["mauer","erde","erde"  ,"mauer","mauer","mauer","erde" ,"erde" ,"mauer"],
+            ["mauer","erde","erde"  ,"mauer","erde" ,"erde" ,"burg" ,"erde" ,"mauer"],
+            ["mauer","mauer","mauer","mauer","erde" ,"mauer","mauer","mauer","mauer"]]
+}

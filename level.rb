@@ -1,45 +1,31 @@
 require 'gosu'
 require_relative 'items'
+require 'json'
 
 class Level
-
-  TEST_LEVEL = [[ :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer ],
-[ :mauer, :hero,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :stein, :erde,  :erde,  :erde,  :erde,  :erde,  nil,    :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :mauer, :mauer, :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :stein, :erde,  :erde,  :erde,  :erde,  :erde,  :stein,   nil,  :erde,  :erde,  :stein, :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :lava,  :erde,  :stein, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :stein, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :mauer, :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :stein, :erde,  :erde,  :stein, :stein, :stein, :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :stein, :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :stein, :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,   nil ,  :mauer, :ork,   :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  nil  ,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,   nil ,   nil ,   nil ,  :erde,  :erde,  :stein, :erde,  :erde,  :erde,  :lava,  nil  ,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :mauer, :mauer, :mauer, :mauer, :mauer, :erde,  :erde,   nil ,  :erde,  :ork,   :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :lava,  :burg,  :lava,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,   nil ,   nil ,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :lava,  :erde,  :lava,  :mauer ],
-[ :mauer, :erde,  :stein, :stein, :erde,  :erde,  :erde,  :erde,  :erde,  :lava,  :erde,  :erde,   nil ,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :lava,  :mauer ],
-[ :mauer, :lava,  :lava,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :lava,  :lava,  :lava,  :mauer ],
-[ :mauer, :schatz,:lava,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :schatz,:erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer, :erde,  :erde,  :erde,  :erde,  :erde,  :erde,  :mauer ],
-[ :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer, :mauer ]]
-
-
-  attr_reader :level
   attr_reader :area
   attr_reader :hero_start_position
+  attr_reader :nummer
+  attr_reader :name
 
-  def initialize(level,items)
-    @level = level
-    @area = TEST_LEVEL
+  def initialize(nummer,items)
+    @nummer = nummer
     @items = items
     @sound_stein = Gosu::Sample.new("media/stone.mp3")
     @music = Gosu::Sample.new("media/music.mp3")
     @music.play(0.5,1,true)
     @last_moved_items = 0
     @last_moved_enemy = 0
-
+    @scroll_x = 2; @scroll_y = 0
+    load_level(nummer)
     set_start_position
+  end
+
+  def load_level(id)
+    data = JSON.parse(File.read("levels/level%03d.json" % id))
+    @name = data['name']
+    @area = data["karte"]
+    @area.each {|row| row.each_index { |i| row[i] = row[i].to_sym if row[i]}}
   end
 
   def try_push(x,y,direction, item)
@@ -58,12 +44,21 @@ class Level
   def draw(player)
     @area.each_index do |y|
       @area[y].each_index do |x|
-        item = @area[y][x]
-        @items.draw(item,x,y)
+        @items.draw(@area[y][x],x,y,@scroll_x, @scroll_y)
       end
     end
-    player.draw
+    player.draw(@scroll_x, @scroll_y)
   end
+
+  def scroll_to(x,y) #13 10
+    @scroll_x +=1 if x-@scroll_x > 20
+    @scroll_x -=1 if x-@scroll_x < 4
+    @scroll_y +=1 if y-@scroll_y > 17
+    @scroll_y -=1 if y-@scroll_y < 2
+    @scroll_x = [[@scroll_x,breite-25].min,0].max
+    @scroll_y = [[@scroll_y,hoehe-20].min,0].max
+  end
+
 
   def move_items(player)
     return if @last_moved_items > Gosu::milliseconds - 300
@@ -148,11 +143,20 @@ class Level
   end
 
   def value(x,y)
+    return :mauer if x<0 || y<0 || x>=breite || y>=hoehe
     @area[y][x]
   end
 
 
 private
+
+  def breite
+    @area.first.size
+  end
+
+  def hoehe
+    @area.size
+  end
 
   def set_start_position
     @area.each_index do |y|

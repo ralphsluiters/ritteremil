@@ -2,19 +2,22 @@ class Player
   attr_accessor :score
   attr_reader :gewonnen
   attr_reader :verloren
+  attr_reader :waffen
+  attr_reader :schluessel_blau
 
 
-
-  def initialize(level)
+  def initialize(level,items)
+    @items = items
     @sound_dig = Gosu::Sample.new("media/dig.mp3")
     @sound_wall = Gosu::Sample.new("media/wall.mp3")
     @sound_ziel = Gosu::Sample.new("media/ziel.mp3")
     @sound_schatz = Gosu::Sample.new("media/treasure.mp3")
 
-    @image = Gosu::Image.new("media/items/knight.png")
     @x, @y = level.hero_start_position
     @score = 0
     @level = level
+    @waffen = 0
+    @schluessel_blau = 0
     @gewonnen = @verloren = false
   end
 
@@ -39,27 +42,44 @@ class Player
       @sound_ziel.play
       @gewonnen = true
     when :stein
-      if @level.try_push(x,y,direction, :stein)
-        @x=x;@y=y
-        @level.clean_position(x,y)
-      end
+      move(x,y) if @level.try_push(x,y,direction, :stein)
     when :ork
-      die!
+      if @waffen > 0
+        move(x,y)
+        @waffen -=1
+      else
+        die!
+      end
+    when :btuer
+      if @schluessel_blau > 0
+        move(x,y)
+        @schluessel_blau -= 1
+      end
+
     when :lava
       die!
     when :schatz
       @sound_schatz.play
       @score +=100
-      @x=x;@y=y
-      @level.clean_position(x,y)
+      move(x,y)
     when :erde
       @sound_dig.play
-      @x=x;@y=y
-      @level.clean_position(x,y)
+      move(x,y)
+    when :bkey
+      @schluessel_blau +=1
+      move(x,y)
+    when :axt
+      @waffen +=1
+      move(x,y)
     else
-      @x=x;@y=y
-      @level.clean_position(x,y)
+      move(x,y)
     end
+  end
+
+  def move(x,y)
+    @x=x; @y=y
+    @level.clean_position(x,y)
+    @level.scroll_to(x,y)
   end
 
   def on_position?(x,y)
@@ -70,8 +90,8 @@ class Player
     @verloren = true
   end
 
-  def draw
-    @image.draw(@x*32, @y*32, 1)
+  def draw(scroll_x,scroll_y)
+    @items.draw(:ritter,@x,@y,scroll_x,scroll_y)
   end
 
 

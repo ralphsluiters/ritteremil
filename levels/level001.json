@@ -1,0 +1,23 @@
+{
+  "name" : "Los gehts...",
+  "karte": [["mauer","mauer","mauer","erde","erde","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer"],
+            ["mauer","hero","erde","erde","erde","erde","erde","erde","erde","erde","erde","stein","erde","erde","erde","erde","erde",null,"erde","erde","erde","erde","erde","erde","erde"],
+            ["mauer","erde","erde","mauer","mauer","mauer","erde","erde","erde","erde","erde","stein","erde","erde","erde","erde","erde","stein",null,"erde","erde","stein","erde","erde","mauer"],
+            ["mauer","erde","erde","mauer","erde","erde","erde","erde","erde","lava","erde","stein","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer"],
+            ["erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","erde","stein","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","erde","erde","mauer","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","mauer","mauer","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","stein","erde","erde","stein","stein","stein","erde","erde","mauer","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","erde","erde","stein","erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","erde","stein","erde","erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde",null,"mauer","ork","erde","erde","erde","erde","erde","erde","erde",null,"erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde",null,null,null,"erde","erde","stein","erde","erde","erde","lava",null,"erde","mauer"],
+            ["mauer","erde","erde","erde","erde","mauer","mauer","mauer","mauer","mauer","erde","erde",null,"bkey","ork","erde","erde","erde","erde","erde","erde","lava","burg","lava","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde",null,null,"erde","erde","erde","erde","erde","erde","erde","erde","lava","erde","lava","mauer"],
+            ["mauer","erde","stein","stein","erde","erde","erde","erde","erde","lava","erde","erde",null,"erde","erde","erde","erde","erde","erde","erde","erde","btuer","erde","lava","mauer"],
+            ["mauer","lava","lava","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","erde","lava","lava","lava","mauer"],
+            ["mauer","schatz","lava","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","schatz","erde","erde","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","axt","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","erde","mauer","erde","erde","erde","erde","erde","erde","mauer"],
+            ["mauer","mauer","mauer","mauer","erde","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer","mauer"]]
+}

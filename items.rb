@@ -9,6 +9,10 @@ class Items
     schatz: {file: 'treasure.png'},
     lava: {file: 'lava_tiles.png', animated: 30},
     ork: {file: 'ork.png'},
+    axt: {file: 'axe.png'},
+    btuer: {file: 'door_blue.png'},
+    bkey: {file: 'key_blue.png'},
+    ritter: {file: 'knight.png'},
     blut: {file: 'blut.png'}
   }
   #animated gifs:  http://gif2sprite.com/
@@ -24,13 +28,22 @@ class Items
     end
   end
 
-  def draw(key, x, y)
+  def draw(key, x, y, scroll_x, scroll_y)
     if key
-      image = @images[key]
-      image = image[Gosu::milliseconds / 100 % image.size] if image.class == Array
-      image.draw(x*32, y*32, 1)
+      if (x-scroll_x >= 0) && (x-scroll_x < 25) && (y-scroll_y >= 0) && (y-scroll_y < 20)
+        image = @images[key]
+        image = image[Gosu::milliseconds / 100 % image.size] if image.class == Array
+        image.draw((x-scroll_x)*32, (y-scroll_y)*32+20, 1)
+      end
     end
   end
 
+  def draw_statusbar(key,x)
+    if key
+      image = @images[key]
+      image = image[Gosu::milliseconds / 100 % image.size] if image.class == Array
+      image.draw(x, 2, 2,0.5,0.5)
+    end
+  end
 
 end

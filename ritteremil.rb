@@ -1,17 +1,20 @@
 require 'gosu'
-require_relative 'items'
-require_relative 'level'
-require_relative 'player'
 
 module ZOrder
   Background, Game, UI = *0..2
 end
 
+require_relative 'items'
+require_relative 'level'
+require_relative 'player'
+require_relative 'statusbar'
+
+
 
 
 class GameWindow < Gosu::Window
   def initialize
-    super 32*25, 32*20
+    super 32*25, 32*20+20
     self.caption = "Ritter Emil"
 
     @background_image = Gosu::Image.new("media/boden.jpg", :tileable => true)
@@ -19,8 +22,8 @@ class GameWindow < Gosu::Window
     @items = Items.new
     @level = Level.new(1,@items)
 
-    @player = Player.new(@level)
-
+    @player = Player.new(@level,@items)
+    @statusleiste = Statusbar.new(@player,@items, @level)
     @font = Gosu::Font.new(20)
 
     @start = true
@@ -60,7 +63,7 @@ class GameWindow < Gosu::Window
     @start_image.draw(0, 50, ZOrder::UI,0.6,0.6) if @start
     @background_image.draw(0, 0, ZOrder::Background)
     @level.draw(@player)
-    @font.draw("Score: #{@player.score}", 10, 10, ZOrder::UI, 1.0, 1.0, 0xff_000000)
+    @statusleiste.draw
     if @player.gewonnen
       @font.draw("Gewonnen!", 100, 100, ZOrder::UI, 4.0, 4.0, 0xff_ffff00)
     end
