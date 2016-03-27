@@ -3,7 +3,9 @@ class Player
   attr_reader :gewonnen
   attr_reader :verloren
   attr_reader :waffen
+  attr_reader :schilde
   attr_reader :schluessel_blau
+  attr_reader :helm
 
 
   def initialize(level,items)
@@ -16,9 +18,10 @@ class Player
     @x, @y = level.hero_start_position
     @score = 0
     @level = level
-    @waffen = 0
+    @waffen = @schilde = 0
     @schluessel_blau = 0
     @gewonnen = @verloren = false
+    @helm = false
   end
 
 
@@ -60,16 +63,28 @@ class Player
       die!
     when :schatz
       @sound_schatz.play
+      @level.add_animation(:schatz,x,y)
       @score +=100
+      move(x,y)
+    when :helm
+      @sound_schatz.play
+      @helm = true
+      @level.add_animation(:helm,x,y)
       move(x,y)
     when :erde
       @sound_dig.play
       move(x,y)
     when :bkey
       @schluessel_blau +=1
+      @level.add_animation(:bkey,x,y)
       move(x,y)
     when :axt
       @waffen +=1
+      @level.add_animation(:axt,x,y)
+      move(x,y)
+    when :schild
+      @schilde +=1
+      @level.add_animation(:schild,x,y)
       move(x,y)
     else
       move(x,y)
@@ -89,6 +104,15 @@ class Player
   def die!
     @verloren = true
   end
+
+  def attacked
+    if @schilde > 0
+      @schilde -= 1
+    else
+      die!
+    end
+  end
+
 
   def draw(scroll_x,scroll_y)
     @items.draw(:ritter,@x,@y,scroll_x,scroll_y)

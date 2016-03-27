@@ -8,6 +8,7 @@ require_relative 'items'
 require_relative 'level'
 require_relative 'player'
 require_relative 'statusbar'
+require_relative 'dialog'
 
 
 
@@ -20,12 +21,12 @@ class GameWindow < Gosu::Window
     @background_image = Gosu::Image.new("media/boden.jpg", :tileable => true)
     @start_image = Gosu::Image.new("media/startbildschirm.jpg")
     @items = Items.new
-    @level = Level.new(1,@items)
+    @level = Level.new(2,@items)
 
     @player = Player.new(@level,@items)
     @statusleiste = Statusbar.new(@player,@items, @level)
     @font = Gosu::Font.new(20)
-
+    @dialog = Dialog.new(self)
     @start = true
   end
 
@@ -55,20 +56,23 @@ class GameWindow < Gosu::Window
       @player.try_move(direction)
       @level.move_items(@player)
       @level.move_enemies(@player)
-
+      @level.move_animations
     end
   end
 
   def draw
-    @start_image.draw(0, 50, ZOrder::UI,0.6,0.6) if @start
+    if @start
+      Gosu::draw_rect(0, 0, width, height, 0x8f_ffffff, ZOrder::UI, :additive)
+      @start_image.draw(0, 50, ZOrder::UI,0.6,0.6)
+    end
     @background_image.draw(0, 0, ZOrder::Background)
     @level.draw(@player)
     @statusleiste.draw
     if @player.gewonnen
-      @font.draw("Gewonnen!", 100, 100, ZOrder::UI, 4.0, 4.0, 0xff_ffff00)
+      @dialog.show("Gewonnen!")
     end
     if @player.verloren
-      @font.draw("Leider verloren!", 100, 100, ZOrder::UI, 4.0, 4.0, 0xff_ff0000)
+      @dialog.show("Leider verloren!")
     end
   end
 
@@ -77,6 +81,7 @@ class GameWindow < Gosu::Window
       close
     end
   end
+
 end
 
 window = GameWindow.new

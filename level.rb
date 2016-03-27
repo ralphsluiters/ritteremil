@@ -17,6 +17,7 @@ class Level
     @last_moved_items = 0
     @last_moved_enemy = 0
     @scroll_x = 2; @scroll_y = 0
+    @animations = []
     load_level(nummer)
     set_start_position
   end
@@ -48,6 +49,16 @@ class Level
       end
     end
     player.draw(@scroll_x, @scroll_y)
+    @animations.each{|a| a.draw}
+  end
+
+  def add_animation(key,x,y)
+    @animations.push(Animation.new(key,(x-@scroll_x)*32,(y-@scroll_y)*32+20,@items))
+  end
+
+  def move_animations
+    @animations.reject! {|a| a.move}
+
   end
 
   def scroll_to(x,y) #13 10
@@ -71,7 +82,7 @@ class Level
           @area[y][x] = :blut
         elsif @area[y][x] == :stein
           if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
-            player.die! if player.on_position?(x,y+2)
+            player.die! if player.on_position?(x,y+2) && !player.helm
             @area[y+2][x] = :blut_neu if @area[y+2][x]== :ork
             @sound_stein.play
             @area[y][x] = nil
@@ -80,12 +91,12 @@ class Level
             @sound_stein.play
             @area[y][x] = nil
           elsif @area[y+1][x] == :stein && !@area[y][x-1] && (!player.on_position?(x-1,y)) && !@area[y+1][x-1] && (!player.on_position?(x-1,y+1))
-            player.die! if player.on_position?(x-1,y+2)
+            player.die! if player.on_position?(x-1,y+2) && !player.helm
             @sound_stein.play
             @area[y][x] = nil
             @area[y+1][x-1] = :stein_gefallen
           elsif @area[y+1][x] == :stein && !@area[y][x+1] && (!player.on_position?(x+1,y)) && !@area[y+1][x+1] && (!player.on_position?(x+1,y+1))
-            player.die! if player.on_position?(x+1,y+2)
+            player.die! if player.on_position?(x+1,y+2) && !player.helm
             @sound_stein.play
             @area[y][x] = nil
             @area[y+1][x+1] = :stein_gefallen
@@ -106,27 +117,39 @@ class Level
           case Gosu.random(0,3).round
           when 0#up
             if !@area[y-1][x]
-              @area[y][x] = nil
-              @area[y-1][x] = :ork
-              player.die! if player.on_position?(x,y-1)
+              if player.on_position?(x,y-1)
+                player.attacked
+              else
+                @area[y][x] = nil
+                @area[y-1][x] = :ork
+              end
             end
           when 1#down
             if !@area[y+1][x]
-              @area[y][x] = nil
-              @area[y+1][x] = :ork_bewegt
-              player.die! if player.on_position?(x,y+1)
+              if player.on_position?(x,y+1)
+                player.attacked
+              else
+                @area[y][x] = nil
+                @area[y+1][x] = :ork_bewegt
+              end
             end
           when 2#left
             if !@area[y][x-1]
-              @area[y][x] = nil
-              @area[y][x-1] = :ork
-              player.die! if player.on_position?(x-1,y)
+              if player.on_position?(x-1,y)
+                player.attacked
+              else
+                @area[y][x] = nil
+                @area[y][x-1] = :ork
+              end
             end
           when 3#right
             if !@area[y][x+1]
-              @area[y][x] = nil
-              @area[y][x+1] = :ork_bewegt
-              player.die! if player.on_position?(x+1,y)
+              if player.on_position?(x+1,y)
+                player.attacked
+              else
+                @area[y][x] = nil
+                @area[y][x+1] = :ork_bewegt
+              end
             end
           end
         elsif @area[y][x] == :ork_bewegt
