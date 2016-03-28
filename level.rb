@@ -52,8 +52,8 @@ class Level
     @animations.each{|a| a.draw}
   end
 
-  def add_animation(key,x,y)
-    @animations.push(Animation.new(key,(x-@scroll_x)*32,(y-@scroll_y)*32+20,@items))
+  def add_animation(key,x,y,sammeln = true)
+    @animations.push(Animation.new(key,(x-@scroll_x)*32,(y-@scroll_y)*32+20,@items,sammeln))
   end
 
   def move_animations
@@ -83,7 +83,7 @@ class Level
         elsif @area[y][x] == :stein
           if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
             player.die! if player.on_position?(x,y+2) && !player.helm
-            @area[y+2][x] = :blut_neu if @area[y+2][x]== :ork
+            @area[y+2][x] = :blut_neu if @area[y+2][x]== :ork && y<hoehe-1
             @sound_stein.play
             @area[y][x] = nil
             @area[y+1][x] = :stein_gefallen
@@ -116,41 +116,13 @@ class Level
         if @area[y][x] == :ork
           case Gosu.random(0,3).round
           when 0#up
-            if !@area[y-1][x]
-              if player.on_position?(x,y-1)
-                player.attacked
-              else
-                @area[y][x] = nil
-                @area[y-1][x] = :ork
-              end
-            end
+            move_enemies_to(x,y,x,y-1,:ork, player)
           when 1#down
-            if !@area[y+1][x]
-              if player.on_position?(x,y+1)
-                player.attacked
-              else
-                @area[y][x] = nil
-                @area[y+1][x] = :ork_bewegt
-              end
-            end
+            move_enemies_to(x,y,x,y+1,:ork_bewegt, player)
           when 2#left
-            if !@area[y][x-1]
-              if player.on_position?(x-1,y)
-                player.attacked
-              else
-                @area[y][x] = nil
-                @area[y][x-1] = :ork
-              end
-            end
+            move_enemies_to(x,y,x-1,y,:ork, player)
           when 3#right
-            if !@area[y][x+1]
-              if player.on_position?(x+1,y)
-                player.attacked
-              else
-                @area[y][x] = nil
-                @area[y][x+1] = :ork_bewegt
-              end
-            end
+            move_enemies_to(x,y,x+1,y,:ork_bewegt, player)
           end
         elsif @area[y][x] == :ork_bewegt
           @area[y][x] = :ork
@@ -172,6 +144,17 @@ class Level
 
 
 private
+
+  def move_enemies_to(x,y,target_x,target_y, key, player)
+    if !@area[target_y][target_x]
+      if player.on_position?(target_x,target_y)
+        player.attacked
+      else
+        @area[y][x] = nil
+        @area[target_y][target_x] = key
+      end
+    end
+  end
 
   def breite
     @area.first.size

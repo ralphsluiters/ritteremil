@@ -54,17 +54,18 @@ class Items
 end
 
 class Animation
-  def initialize(key, x,y, items)
+  def initialize(key, x,y, items, sammeln = true)
     @items = items
     @x = x ; @y = y
     @start_y = y
     @key = key
     @last=0
     @scale = 1
+    @sammeln = sammeln
   end
 
   def draw
-    @items.draw_on_position(@key,@x,@y, ZOrder::UI, @scale)
+    @items.draw_on_position(@key,@x,@sammeln ? @y : @start_y, ZOrder::UI, @scale)
   end
 
   def move

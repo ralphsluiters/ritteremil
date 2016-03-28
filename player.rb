@@ -49,6 +49,7 @@ class Player
     when :ork
       if @waffen > 0
         move(x,y)
+        @level.add_animation(:axt,x,y, false)
         @waffen -=1
       else
         die!
@@ -56,6 +57,7 @@ class Player
     when :btuer
       if @schluessel_blau > 0
         move(x,y)
+        @level.add_animation(:bkey,x,y, false)
         @schluessel_blau -= 1
       end
 
@@ -107,6 +109,7 @@ class Player
 
   def attacked
     if @schilde > 0
+      @level.add_animation(:schild,@x,@y, false)
       @schilde -= 1
     else
       die!
