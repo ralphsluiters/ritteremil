@@ -22,10 +22,10 @@ class Player
 
   def initialize(level,items)
     @items = items
-    @sound_dig = Gosu::Sample.new("media/dig.mp3")
-    @sound_wall = Gosu::Sample.new("media/wall.mp3")
-    @sound_ziel = Gosu::Sample.new("media/ziel.mp3")
-    @sound_schatz = Gosu::Sample.new("media/treasure.mp3")
+    @sound_dig = Gosu::Sample.new("media/dig.ogg")
+    @sound_wall = Gosu::Sample.new("media/wall.ogg")
+    @sound_ziel = Gosu::Sample.new("media/ziel.ogg")
+    @sound_schatz = Gosu::Sample.new("media/treasure.ogg")
 
     @x, @y = level.hero_start_position
     @score = 0

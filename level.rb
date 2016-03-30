@@ -24,8 +24,8 @@ class Level
   def initialize(nummer,items)
     @nummer = nummer
     @items = items
-    @sound_stein = Gosu::Sample.new("media/stone.mp3")
-    @music = Gosu::Sample.new("media/music.mp3")
+    @sound_stein = Gosu::Sample.new("media/stone.ogg")
+    @music = Gosu::Sample.new("media/music.ogg")
     @music.play(0.5,1,true)
     @last_moved_items = 0
     @last_moved_enemy = 0
