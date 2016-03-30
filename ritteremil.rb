@@ -15,7 +15,7 @@ require_relative 'dialog'
 
 class GameWindow < Gosu::Window
   def initialize(level_nummer)
-    super 32*25, 32*20+20
+    super(32*25, 32*20+20)#, fullscreen: true )
     self.caption = "Ritter Emil"
     @level_nummer = level_nummer.to_i>0 ? level_nummer.to_i : 1
 
@@ -48,27 +48,39 @@ class GameWindow < Gosu::Window
       when :spielen
         @state_machine = :gewonnen if @player.gewonnen
         @state_machine = :verloren if @player.verloren
-        direction = nil
-        if Gosu::button_down? Gosu::KbLeft or Gosu::button_down? Gosu::GpLeft then
-          direction = :left
-          sleep 0.2
+        if Gosu::button_down?(Gosu::KbP)
+          @state_machine = :pause
+          sleep 0.5
+        else
+
+          direction = nil
+          if Gosu::button_down? Gosu::KbLeft or Gosu::button_down? Gosu::GpLeft then
+            direction = :left
+            sleep 0.2
+          end
+          if Gosu::button_down? Gosu::KbRight or Gosu::button_down? Gosu::GpRight then
+            direction = :right
+            sleep 0.2
+          end
+          if Gosu::button_down? Gosu::KbUp or Gosu::button_down? Gosu::GpUp then
+            direction = :up
+            sleep 0.2
+          end
+          if Gosu::button_down?(Gosu::KbDown) or Gosu::button_down? Gosu::GpDown then
+            direction = :down
+            sleep 0.2
+          end
+
+          @player.try_move(direction)
+          @level.move_items(@player)
+          @level.move_enemies(@player)
+          @level.move_animations
         end
-        if Gosu::button_down? Gosu::KbRight or Gosu::button_down? Gosu::GpRight then
-          direction = :right
-          sleep 0.2
+      when :pause
+        if Gosu::button_down? Gosu::KbP
+          sleep 0.5
+          @state_machine = :spielen
         end
-        if Gosu::button_down? Gosu::KbUp or Gosu::button_down? Gosu::GpUp then
-          direction = :up
-          sleep 0.2
-        end
-        if Gosu::button_down? Gosu::KbDown or Gosu::button_down? Gosu::GpDown then
-          direction = :down
-          sleep 0.2
-        end
-        @player.try_move(direction)
-        @level.move_items(@player)
-        @level.move_enemies(@player)
-        @level.move_animations
       when :gewonnen
         @level_nummer += 1
         wait_time(2,:level_start)
@@ -84,16 +96,18 @@ class GameWindow < Gosu::Window
       Gosu::draw_rect(0, 0, width, height, 0x8f_ffffff, ZOrder::UI, :additive)
       @start_image.draw(0, 50, ZOrder::UI,0.6,0.6)
     when :level_start
-      @dialog.show("Level: #{@level_nummer}")
+      @dialog.show("Level #{@level_nummer}: #{@level.name}",@level.tipp)
 
     when :spielen
       @background_image.draw(0, 0, ZOrder::Background)
       @level.draw(@player)
       @statusleiste.draw
+    when :pause
+      @dialog.show("P A U S E !", "P drücken um weiterzuspielen")
     when :gewonnen
       @dialog.show("Gewonnen!")
     when :verloren
-      @dialog.show("Leider verloren!")
+      @dialog.show("Leider verloren!",@player.comment)
     end
   end
 

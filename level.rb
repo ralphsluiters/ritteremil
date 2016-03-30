@@ -8,6 +8,19 @@ class Level
   attr_reader :nummer
   attr_reader :name
 
+  TIPPS = ["Handschuhe schützen vor Feuer und Lava.",
+           "Schilde schützen, wenn Feinde angreifen.",
+           "Mit Äxten kann man Feinde angreifen.",
+           "Äxte schützen nicht vor Feinden.",
+           "Ein Helm hilft bei fallenden Steinen.",
+           "Steine versinken in Lava.",
+           "Man kann schneller rennen als die Feinde.",
+           "Feuer breitet sich aus.",
+           "Orks wissen nie, wo sie hinlaufen.",
+           "Skelette laufen immer zum Held.",
+           "Die Burg ist das Ziel."]
+
+
   def initialize(nummer,items)
     @nummer = nummer
     @items = items
@@ -18,6 +31,7 @@ class Level
     @last_moved_enemy = 0
     @scroll_x = 2; @scroll_y = 0
     @animations = []
+    @tipp_nummer = Gosu.random(1,TIPPS.size)-1
     load_level(nummer)
     set_start_position
   end
@@ -62,10 +76,10 @@ class Level
   end
 
   def scroll_to(x,y) #13 10
-    @scroll_x +=1 if x-@scroll_x > 20
-    @scroll_x -=1 if x-@scroll_x < 4
-    @scroll_y +=1 if y-@scroll_y > 17
-    @scroll_y -=1 if y-@scroll_y < 2
+    @scroll_x +=1 if x-@scroll_x > 17
+    @scroll_x -=1 if x-@scroll_x < 7
+    @scroll_y +=1 if y-@scroll_y > 13
+    @scroll_y -=1 if y-@scroll_y < 6
     @scroll_x = [[@scroll_x,breite-25].min,0].max
     @scroll_y = [[@scroll_y,hoehe-20].min,0].max
   end
@@ -74,38 +88,69 @@ class Level
   def move_items(player)
     return if @last_moved_items > Gosu::milliseconds - 300
     @last_moved_items = Gosu::milliseconds
+    area_new = Marshal.load(Marshal.dump(@area))
+    feuer_gefunden = false
     @area.each_index do |y|
       @area[y].each_index do |x|
-        if @area[y][x] == :blut
-          @area[y][x] = nil
-        elsif @area[y][x] == :blut_neu
-          @area[y][x] = :blut
+        if @area[y][x] == :feuer && (!feuer_gefunden) && Gosu.random(0,20)<1
+          if !@area[y-1][x]
+            area_new[y-1][x] = :feuer
+            feuer_gefunden = true
+          elsif !@area[y+1][x]
+            area_new[y+1][x] = :feuer
+            feuer_gefunden = true
+          elsif !@area[y][x-1]
+            area_new[y][x-1] = :feuer
+            feuer_gefunden = true
+          elsif !@area[y][x+1]
+            area_new[y][x+1] = :feuer
+            feuer_gefunden = true
+          end
+        elsif @area[y][x] == :explosion_bald
+          explosion(x,y,player,area_new)
+        elsif @area[y][x] == :explosion
+          area_new[y][x] = nil
+        elsif @area[y][x] == :blut
+          area_new[y][x] = nil
+        elsif @area[y][x] == :fass
+          if !@area[y+1][x] && (!player.on_position?(x,y+1))
+            area_new[y][x] = nil
+            area_new[y+1][x] = :fass_fallend
+          end
+        elsif @area[y][x] == :fass_fallend
+          if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
+            area_new[y][x] = nil
+            area_new[y+1][x] = :fass_fallend
+          else
+            explosion(x,y,player,area_new)
+          end
         elsif @area[y][x] == :stein
           if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
-            player.die! if player.on_position?(x,y+2) && !player.helm
-            @area[y+2][x] = :blut_neu if @area[y+2][x]== :ork && y<hoehe-1
+            player.die!(:stein) if player.on_position?(x,y+2) && !player.helm
+            area_new[y+2][x] = :fass_fallend if @area[y+2][x] == :fass
+            area_new[y+2][x] = :blut if @area[y+2][x]== :ork && y<hoehe-1
+            area_new[y+2][x] = nil if @area[y+2][x]== :skelett && y<hoehe-1
             @sound_stein.play
-            @area[y][x] = nil
-            @area[y+1][x] = :stein_gefallen
+            area_new[y][x] = nil
+            area_new[y+1][x] = :stein
           elsif @area[y+1][x] == :lava
             @sound_stein.play
-            @area[y][x] = nil
+            area_new[y][x] = nil
           elsif @area[y+1][x] == :stein && !@area[y][x-1] && (!player.on_position?(x-1,y)) && !@area[y+1][x-1] && (!player.on_position?(x-1,y+1))
-            player.die! if player.on_position?(x-1,y+2) && !player.helm
+            player.die!(:stein) if player.on_position?(x-1,y+2) && !player.helm
             @sound_stein.play
-            @area[y][x] = nil
-            @area[y+1][x-1] = :stein_gefallen
+            area_new[y][x] = nil
+            area_new[y+1][x-1] = :stein
           elsif @area[y+1][x] == :stein && !@area[y][x+1] && (!player.on_position?(x+1,y)) && !@area[y+1][x+1] && (!player.on_position?(x+1,y+1))
-            player.die! if player.on_position?(x+1,y+2) && !player.helm
+            player.die!(:stein) if player.on_position?(x+1,y+2) && !player.helm
             @sound_stein.play
-            @area[y][x] = nil
-            @area[y+1][x+1] = :stein_gefallen
+            area_new[y][x] = nil
+            area_new[y+1][x+1] = :stein
           end
-        elsif @area[y][x] == :stein_gefallen
-          @area[y][x] = :stein
         end
       end
     end
+    @area = area_new
   end
 
   def move_enemies(player)
@@ -124,14 +169,47 @@ class Level
           when 3#right
             move_enemies_to(x,y,x+1,y,:ork_bewegt, player)
           end
+        elsif @area[y][x] == :skelett
+          moved = false
+          if player.x < x
+            moved = true if move_enemies_to(x,y,x-1,y,:skelett, player)
+          elsif player.x > x
+            moved = true if move_enemies_to(x,y,x+1,y,:skelett_bewegt, player)
+          end
+          unless moved
+            if player.y < y
+              move_enemies_to(x,y,x,y-1,:skelett, player)
+            elsif player.y > y
+              move_enemies_to(x,y,x,y+1,:skelett_bewegt, player)
+            end
+          end
         elsif @area[y][x] == :ork_bewegt
           @area[y][x] = :ork
+        elsif @area[y][x] == :skelett_bewegt
+          @area[y][x] = :skelett
         end
       end
     end
   end
 
+  def explosion(x,y,player,area_new)
+    ([y-1,0].max..[y+1,hoehe-1].min).each do |ii|
+      ([x-1,0].max..[x+1,breite-1].min).each do |i|
+        player.die!(:explosion) if player.on_position?(i,ii)
+        if ![:lava,:mauer].include?(@area[ii][i])
+          area_new[ii][i] = if [:fass,:fass_fallend].include?(@area[ii][i]) && !(y==ii && x==i)
+            :explosion_bald
+          else
+            :explosion
+          end
+        end
+      end
+    end
+  end
 
+  def tipp
+    "Tipp: #{TIPPS[@tipp_nummer]}"
+  end
 
   def clean_position(x,y)
     @area[y][x] = nil
@@ -148,11 +226,14 @@ private
   def move_enemies_to(x,y,target_x,target_y, key, player)
     if !@area[target_y][target_x]
       if player.on_position?(target_x,target_y)
-        player.attacked
+        player.attacked(key)
       else
         @area[y][x] = nil
         @area[target_y][target_x] = key
       end
+      return true
+    else
+      return false
     end
   end
 

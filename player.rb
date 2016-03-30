@@ -5,7 +5,19 @@ class Player
   attr_reader :waffen
   attr_reader :schilde
   attr_reader :schluessel_blau
+  attr_reader :handschuhe
   attr_reader :helm
+  attr_reader :x
+  attr_reader :y
+
+  VERLOREN_TEXTE = {
+    lava: "Autsch! Lava ist heiss.",
+    feuer: "Autsch! Finger verbrannt.",
+    ork: "Hilfe! Ein Ork.",
+    skelett: "Huch, ein Skelett!",
+    stein: "Beule am Kopf!",
+    explosion: "BOOOOOOM!"
+  }
 
 
   def initialize(level,items)
@@ -19,6 +31,7 @@ class Player
     @score = 0
     @level = level
     @waffen = @schilde = 0
+    @handschuhe = 0
     @schluessel_blau = 0
     @gewonnen = @verloren = false
     @helm = false
@@ -46,13 +59,23 @@ class Player
       @gewonnen = true
     when :stein
       move(x,y) if @level.try_push(x,y,direction, :stein)
+    when :fass
+      move(x,y) if @level.try_push(x,y,direction, :fass)
     when :ork
       if @waffen > 0
         move(x,y)
         @level.add_animation(:axt,x,y, false)
         @waffen -=1
       else
-        die!
+        die!(:ork)
+      end
+    when :skelett
+      if @waffen > 0
+        move(x,y)
+        @level.add_animation(:axt,x,y, false)
+        @waffen -=1
+      else
+        die!(:skelett)
       end
     when :btuer
       if @schluessel_blau > 0
@@ -61,8 +84,27 @@ class Player
         @schluessel_blau -= 1
       end
 
+    when :explosion
+      if @handschuhe > 0
+        @level.add_animation(:glove,x,y, false)
+        @handschuhe -=1
+      else
+        die!(:explosion)
+      end
+    when :feuer
+      if @handschuhe > 0
+        @level.add_animation(:glove,x,y, false)
+        @handschuhe -=1
+      else
+        die!(:feuer)
+      end
     when :lava
-      die!
+      if @handschuhe > 0
+        @level.add_animation(:glove,x,y, false)
+        @handschuhe -=1
+      else
+        die!(:lava)
+      end
     when :schatz
       @sound_schatz.play
       @level.add_animation(:schatz,x,y)
@@ -84,6 +126,10 @@ class Player
       @waffen +=1
       @level.add_animation(:axt,x,y)
       move(x,y)
+    when :glove
+      @handschuhe +=1
+      @level.add_animation(:glove,x,y)
+      move(x,y)
     when :schild
       @schilde +=1
       @level.add_animation(:schild,x,y)
@@ -103,19 +149,21 @@ class Player
     x==@x && y==@y
   end
 
-  def die!
-    @verloren = true
+  def die!(key)
+    @verloren = key
   end
 
-  def attacked
+  def attacked(enemy)
     if @schilde > 0
       @level.add_animation(:schild,@x,@y, false)
       @schilde -= 1
     else
-      die!
+      die!(enemy)
     end
   end
-
+  def comment
+    VERLOREN_TEXTE[verloren] if verloren
+  end
 
   def draw(scroll_x,scroll_y)
     @items.draw(:ritter,@x,@y,scroll_x,scroll_y)

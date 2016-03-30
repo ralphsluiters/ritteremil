@@ -9,12 +9,19 @@ class Items
     schatz: {file: 'treasure.png'},
     lava: {file: 'lava_tiles.png', animated: 30},
     ork: {file: 'ork.png'},
+    skelett: {file: 'skeleton.png'},
     axt: {file: 'axe.png'},
     btuer: {file: 'door_blue.png'},
     bkey: {file: 'key_blue.png'},
     ritter: {file: 'knight.png'},
+    feuer: {file: 'feuer.png'},
+    glove: {file: 'glove.png'},
     helm: {file: 'helmet.gif'},
     schild: {file: 'shield.gif'},
+    fass: {file: 'pulverfass.gif'},
+    fass_fallend: {file: 'pulverfass.gif'},
+    explosion: {file: 'explosion.png', animated: 10},
+    explosion_bald: {file: 'explosion.png', animated: 10},
     blut: {file: 'blut.png'}
   }
   #animated gifs:  http://gif2sprite.com/

@@ -10,8 +10,10 @@ class Statusbar
 
   def draw
     @font.draw("Level: #{@level.nummer}", 10, 1, ZOrder::UI, 1.0, 1.0, 0xff_000000)
-    @items.draw_statusbar(:schatz,210)
-    @font.draw("#{@player.score}", 230, 1, ZOrder::UI, 1.0, 1.0, 0xff_000000)
+    @items.draw_statusbar(:schatz,120)
+    @font.draw("#{@player.score}", 140, 1, ZOrder::UI, 1.0, 1.0, 0xff_000000)
+    @items.draw_statusbar(:glove,210)
+    @font.draw("#{@player.handschuhe}", 230, 1, ZOrder::UI, 1.0, 1.0, 0xff_000000)
     @items.draw_statusbar(:axt,300)
     @font.draw("#{@player.waffen}", 320, 1, ZOrder::UI, 1.0, 1.0, 0xff_000000)
     @items.draw_statusbar(:schild,345)

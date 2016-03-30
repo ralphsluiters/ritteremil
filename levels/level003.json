@@ -1,8 +1,8 @@
 {
   "name" : "Klein...",
-  "karte": [["mauer","mauer","mauer","erde" ,"erde" ,"mauer","mauer","mauer","mauer"],
-            ["mauer","hero","erde"  ,"erde" ,"erde" ,"erde" ,"erde" ,"erde" ,"mauer"],
-            ["mauer","erde","erde"  ,"mauer","mauer","mauer","erde" ,"erde" ,"mauer"],
-            ["mauer","erde","erde"  ,"mauer","erde" ,"erde" ,"burg" ,"erde" ,"mauer"],
-            ["mauer","mauer","mauer","mauer","erde" ,"mauer","mauer","mauer","mauer"]]
+  "karte": [["lava","lava","lava","stein" ,"stein" ,"lava","lava","lava","lava"],
+            ["lava","hero","stein"  ,"erde" ,"erde" ,"erde" ,"erde" ,"erde" ,"lava"],
+            ["lava","erde","erde"  ,"lava","lava","lava","lava" ,"erde" ,"lava"],
+            ["lava","erde","lava"  ,"lava","erde" ,"erde" ,"burg" ,"erde" ,"lava"],
+            ["lava","lava","lava","lava","erde" ,"lava","lava","lava","lava"]]
 }
