@@ -4,6 +4,7 @@ module ZOrder
   Background, Game, UI = *0..2
 end
 
+require_relative 'sounds'
 require_relative 'items'
 require_relative 'level'
 require_relative 'player'
@@ -18,14 +19,16 @@ class GameWindow < Gosu::Window
     super(32*25, 32*20+20)#, fullscreen: true )
     self.caption = "Ritter Emil"
     @level_nummer = level_nummer.to_i>0 ? level_nummer.to_i : 1
+    @settings = {sound_on: true, music_on: true}
 
     @background_image = Gosu::Image.new("media/boden.jpg", :tileable => true)
     @start_image = Gosu::Image.new("media/startbildschirm.jpg")
-    @items = Items.new
+    @sounds = Sounds.new(@settings)
+    @sounds.play_music
+    @items = Items.new(@sounds)
     @level = Level.new(@level_nummer,@items)
     @player = Player.new(@level,@items)
-    @statusleiste = Statusbar.new(@player,@items, @level)
-    @font = Gosu::Font.new(20)
+    @statusleiste = Statusbar.new(@player,@items, @level,@settings)
     @dialog = Dialog.new(self)
     @state_machine = :spiel_start
   end
@@ -43,7 +46,7 @@ class GameWindow < Gosu::Window
       when :level_start
         @level = Level.new(@level_nummer,@items)
         @player = Player.new(@level,@items)
-        @statusleiste = Statusbar.new(@player,@items, @level)
+        @statusleiste = Statusbar.new(@player,@items, @level,@settings)
         wait_time(2,:spielen)
       when :spielen
         @state_machine = :gewonnen if @player.gewonnen
@@ -52,7 +55,15 @@ class GameWindow < Gosu::Window
           @state_machine = :pause
           sleep 0.5
         else
+          if Gosu::button_down? Gosu::KbM
+            @settings[:music_on]= !@settings[:music_on]
 
+            sleep 0.2
+          end
+          if Gosu::button_down? Gosu::KbS
+            @settings[:sound_on]= !@settings[:sound_on]
+            sleep 0.2
+          end
           direction = nil
           if Gosu::button_down? Gosu::KbLeft or Gosu::button_down? Gosu::GpLeft then
             direction = :left

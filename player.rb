@@ -22,11 +22,6 @@ class Player
 
   def initialize(level,items)
     @items = items
-    @sound_dig = Gosu::Sample.new("media/dig.ogg")
-    @sound_wall = Gosu::Sample.new("media/wall.ogg")
-    @sound_ziel = Gosu::Sample.new("media/ziel.ogg")
-    @sound_schatz = Gosu::Sample.new("media/treasure.ogg")
-
     @x, @y = level.hero_start_position
     @score = 0
     @level = level
@@ -53,9 +48,9 @@ class Player
 
     case @level.value(x,y)
     when :mauer
-      @sound_wall.play
+      @items.play_sound(:wall)
     when :burg
-      @sound_ziel.play
+      @items.play_sound(:ziel)
       @gewonnen = true
     when :stein
       move(x,y) if @level.try_push(x,y,direction, :stein)
@@ -106,17 +101,17 @@ class Player
         die!(:lava)
       end
     when :schatz
-      @sound_schatz.play
+      @items.play_sound(:schatz)
       @level.add_animation(:schatz,x,y)
       @score +=100
       move(x,y)
     when :helm
-      @sound_schatz.play
+      @items.play_sound(:schatz)
       @helm = true
       @level.add_animation(:helm,x,y)
       move(x,y)
     when :erde
-      @sound_dig.play
+      @items.play_sound(:dig)
       move(x,y)
     when :bkey
       @schluessel_blau +=1

@@ -24,9 +24,7 @@ class Level
   def initialize(nummer,items)
     @nummer = nummer
     @items = items
-    @sound_stein = Gosu::Sample.new("media/stone.ogg")
-    @music = Gosu::Sample.new("media/music.ogg")
-    @music.play(0.5,1,true)
+
     @last_moved_items = 0
     @last_moved_enemy = 0
     @scroll_x = 2; @scroll_y = 0
@@ -107,6 +105,7 @@ class Level
             feuer_gefunden = true
           end
         elsif @area[y][x] == :explosion_bald
+          area_new[y][x] = :explosion
           explosion(x,y,player,area_new)
         elsif @area[y][x] == :explosion
           area_new[y][x] = nil
@@ -130,20 +129,20 @@ class Level
             area_new[y+2][x] = :fass_fallend if @area[y+2][x] == :fass
             area_new[y+2][x] = :blut if @area[y+2][x]== :ork && y<hoehe-1
             area_new[y+2][x] = nil if @area[y+2][x]== :skelett && y<hoehe-1
-            @sound_stein.play
+            @items.play_sound(:stein)
             area_new[y][x] = nil
             area_new[y+1][x] = :stein
           elsif @area[y+1][x] == :lava
-            @sound_stein.play
+            @items.play_sound(:stein)
             area_new[y][x] = nil
           elsif @area[y+1][x] == :stein && !@area[y][x-1] && (!player.on_position?(x-1,y)) && !@area[y+1][x-1] && (!player.on_position?(x-1,y+1))
             player.die!(:stein) if player.on_position?(x-1,y+2) && !player.helm
-            @sound_stein.play
+            @items.play_sound(:stein)
             area_new[y][x] = nil
             area_new[y+1][x-1] = :stein
           elsif @area[y+1][x] == :stein && !@area[y][x+1] && (!player.on_position?(x+1,y)) && !@area[y+1][x+1] && (!player.on_position?(x+1,y+1))
             player.die!(:stein) if player.on_position?(x+1,y+2) && !player.helm
-            @sound_stein.play
+            @items.play_sound(:stein)
             area_new[y][x] = nil
             area_new[y+1][x+1] = :stein
           end
@@ -196,7 +195,7 @@ class Level
     ([y-1,0].max..[y+1,hoehe-1].min).each do |ii|
       ([x-1,0].max..[x+1,breite-1].min).each do |i|
         player.die!(:explosion) if player.on_position?(i,ii)
-        if ![:lava,:mauer].include?(@area[ii][i])
+        if ![:lava,:mauer, :explosion_bald].include?(@area[ii][i])
           area_new[ii][i] = if [:fass,:fass_fallend].include?(@area[ii][i]) && !(y==ii && x==i)
             :explosion_bald
           else

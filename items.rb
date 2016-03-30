@@ -22,11 +22,15 @@ class Items
     fass_fallend: {file: 'pulverfass.gif'},
     explosion: {file: 'explosion.png', animated: 10},
     explosion_bald: {file: 'explosion.png', animated: 10},
+    music: {file: 'music.png'},
+    sound: {file: 'sound.png'},
+    kein: {file: 'no.png'},
     blut: {file: 'blut.png'}
   }
   #animated gifs:  http://gif2sprite.com/
 
-  def initialize
+  def initialize(sounds)
+    @sounds = sounds
     @images = {}
     TYPES.each do |key,value|
       @images[key] = if value[:animated]
@@ -36,6 +40,11 @@ class Items
         end
     end
   end
+
+  def play_sound(key)
+    @sounds.play_sound(key)
+  end
+
 
   def draw(key, x, y, scroll_x, scroll_y)
     if key
