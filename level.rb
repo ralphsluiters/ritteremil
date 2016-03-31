@@ -1,12 +1,14 @@
 require 'gosu'
 require_relative 'items'
 require 'json'
+require 'fileutils'
 
 class Level
   attr_reader :area
   attr_reader :hero_start_position
   attr_reader :nummer
   attr_reader :name
+  attr_reader :scroll_x,:scroll_y
 
   TIPPS = ["Handschuhe schützen vor Feuer und Lava.",
            "Schilde schützen, wenn Feinde angreifen.",
@@ -21,17 +23,18 @@ class Level
            "Die Burg ist das Ziel."]
 
 
-  def initialize(nummer,items)
+  def initialize(nummer,items,editmode = false)
+    @editmode = editmode
     @nummer = nummer
     @items = items
 
     @last_moved_items = 0
     @last_moved_enemy = 0
-    @scroll_x = 2; @scroll_y = 0
+    @scroll_x = 0; @scroll_y = 0
     @animations = []
     @tipp_nummer = Gosu.random(1,TIPPS.size)-1
     load_level(nummer)
-    set_start_position
+    set_start_position if @editmode
   end
 
   def load_level(id)
@@ -40,6 +43,18 @@ class Level
     @area = data["karte"]
     @area.each {|row| row.each_index { |i| row[i] = row[i].to_sym if row[i]}}
   end
+
+  def save_level(id=@nummer)
+    file_name = "levels/level%03d.json" % id
+    file_name_bak = "levels/level%03d_#{Time.now.strftime("%Y%m%d%H%M%S")}.bak" % id
+
+    FileUtils.mv file_name, file_name_bak, :force => true
+    data = {name: @name.to_s, karte: @area}
+    File.open(file_name,"w") do |f|
+      f.write(data.to_json)
+    end
+  end
+
 
   def try_push(x,y,direction, item)
     if direction == :left && !@area[y][x-1]
@@ -214,9 +229,22 @@ class Level
     @area[y][x] = nil
   end
 
+  def set_position!(x,y,key) #only for level edit
+    @area[y][x] = key
+  end
+
+
   def value(x,y)
-    return :mauer if x<0 || y<0 || x>=breite || y>=hoehe
+    return :levelende if x<0 || y<0 || x>=breite || y>=hoehe
     @area[y][x]
+  end
+
+  def breite
+    @area.first.size
+  end
+
+  def hoehe
+    @area.size
   end
 
 
@@ -234,14 +262,6 @@ private
     else
       return false
     end
-  end
-
-  def breite
-    @area.first.size
-  end
-
-  def hoehe
-    @area.size
   end
 
   def set_start_position

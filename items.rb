@@ -19,13 +19,14 @@ class Items
     helm: {file: 'helmet.gif'},
     schild: {file: 'shield.gif'},
     fass: {file: 'pulverfass.gif'},
-    fass_fallend: {file: 'pulverfass.gif'},
-    explosion: {file: 'explosion.png', animated: 10},
-    explosion_bald: {file: 'explosion.png', animated: 10},
-    music: {file: 'music.png'},
-    sound: {file: 'sound.png'},
-    kein: {file: 'no.png'},
-    blut: {file: 'blut.png'}
+    fass_fallend: {file: 'pulverfass.gif', drawable: false},
+    explosion: {file: 'explosion.png', animated: 10, drawable: false},
+    explosion_bald: {file: 'explosion.png', animated: 10, drawable: false},
+    music: {file: 'music.png', drawable: false},
+    sound: {file: 'sound.png', drawable: false},
+    kein: {file: 'no.png', drawable: false},
+    selection: {file: 'selection_mask.png', drawable: false, animated: 3}, # for leveledit
+    blut: {file: 'blut.png', drawable: false}
   }
   #animated gifs:  http://gif2sprite.com/
 
@@ -66,6 +67,10 @@ class Items
     image = @images[key]
     image = image[Gosu::milliseconds / 100 % image.size] if image.class == Array
     image.draw(x, y, z,scale,scale)
+  end
+
+  def self.drawable_items
+    [nil] + TYPES.select{|k,v| v[:drawable] != false}.keys
   end
 end
 

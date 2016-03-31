@@ -47,6 +47,8 @@ class Player
     end
 
     case @level.value(x,y)
+    when :levelende
+      @items.play_sound(:wall)
     when :mauer
       @items.play_sound(:wall)
     when :burg
