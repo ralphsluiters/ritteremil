@@ -12,6 +12,8 @@ require_relative 'dialog'
 
 
 class GameWindow < Gosu::Window
+  attr_reader :selektion_x,:selektion_y
+
   def initialize(level_nummer)
     super(32*25+20, 32*20+20+20+32+20)#, fullscreen: true )
     self.caption = "Ritter Emil - Leveleditor"
@@ -19,7 +21,6 @@ class GameWindow < Gosu::Window
     @items = Items.new(nil)
     @new_level_width = 25
     @new_level_height = 20
-
     if level_nummer.to_i>0 #given level as parameter
       @level_nummer = level_nummer.to_i
       @level = Level.new(@level_nummer,@items,true)
@@ -48,32 +49,52 @@ class GameWindow < Gosu::Window
       case @state_machine
       when :level_edit
         if Gosu::button_down? Gosu::KbLeft
-          @position.move(@position.x-1,@position.y)
+          if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift)) && @position.sel_x > 1
+            @position.sel_x -=1
+          else
+            @position.move(@position.x-1,@position.y)
+          end
           sleep 0.2
         end
         if Gosu::button_down? Gosu::KbRight
-          @position.move(@position.x+1,@position.y)
+          if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift))
+            @position.sel_x +=1
+          else
+            @position.move(@position.x+1,@position.y)
+          end
           sleep 0.2
         end
         if Gosu::button_down? Gosu::KbUp
-          @position.move(@position.x,@position.y-1)
+          if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift)) && @position.sel_y > 1
+            @position.sel_y -=1
+          else
+            @position.move(@position.x,@position.y-1)
+          end
           sleep 0.2
         end
         if Gosu::button_down?(Gosu::KbDown)
-          @position.move(@position.x,@position.y+1)
+          if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift))
+            @position.sel_y +=1
+          else
+            @position.move(@position.x,@position.y+1)
+          end
           sleep 0.2
         end
 
-        if Gosu::button_down?(Gosu::KbY)
+        if Gosu::button_down?(Gosu::KbX)
           @position.move_key(@position.key_pos-1)
           sleep 0.2
         end
-        if Gosu::button_down?(Gosu::KbX)
+        if Gosu::button_down?(Gosu::KbC)
           @position.move_key(@position.key_pos+1)
           sleep 0.2
         end
         if Gosu::button_down?(Gosu::KbSpace)
-          @level.set_position!(@position.x,@position.y,@position.key)
+          (0...@position.sel_y).each do |ii|
+            (0...@position.sel_x).each do |i|
+              @level.set_position!(@position.x+i,@position.y+ii,@position.key)
+            end
+          end
           sleep 0.2
         end
         if Gosu::button_down?(Gosu::KbN)
@@ -173,7 +194,7 @@ class GameWindow < Gosu::Window
       when :save_game
         @dialog.show("Speichern!","Level #{@level.nummer}\nPfeile um Levelnummer zu ändern\nENTER zum Speichern\nESC zum Abbrechen")
       when :level_edit_start
-        @dialog.show("Leveleditor!","Y / X zum Wechseln der Items\nS zum Speichern\nL zum Laden\nN für neues Level\nQ zum Beenden")
+        @dialog.show("Leveleditor!","X/C zum Wechseln der Items\nS zum Speichern\nL zum Laden\nN für neues Level\nQ zum Beenden")
       end
     end
   end
@@ -205,11 +226,13 @@ end
 class Position
   attr_reader :x,:y
   attr_reader :key_pos
+  attr_accessor :sel_x,:sel_y
   def initialize(items, level)
     @x = @y = 0
     @items = items
     @level = level
     @key_pos = 0
+    @sel_x = @sel_y = 1
   end
   def move(x,y)
     if @level.value(x,y) != :levelende
@@ -228,7 +251,11 @@ class Position
   end
 
   def draw(scroll_x,scroll_y)
-    @items.draw(:selection,@x,@y,scroll_x,scroll_y)
+    (0...@sel_y).each do |ii|
+      (0...@sel_x).each do |i|
+        @items.draw(:selection,@x+i,@y+ii,scroll_x,scroll_y)
+      end
+    end
     @items.draw_on_position(:selection,@key_pos*32,20*32+40,ZOrder::UI)
   end
 

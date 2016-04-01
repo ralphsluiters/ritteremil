@@ -242,6 +242,7 @@ class Level
   end
 
   def set_position!(x,y,key) #only for level edit
+    return if x>=breite || y>=hoehe
     @area[y][x] = key
   end
 
