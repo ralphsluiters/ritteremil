@@ -32,13 +32,25 @@ class Level
     @last_moved_enemy = 0
     @scroll_x = 0; @scroll_y = 0
     @animations = []
-    @tipp_nummer = Gosu.random(1,TIPPS.size)-1
-    load_level(nummer)
-    set_start_position if @editmode
+    unless @editmode
+      @tipp_nummer = Gosu.random(1,TIPPS.size)-1
+      load_level
+      set_start_position
+    end
   end
 
-  def load_level(id)
-    data = JSON.parse(File.read("levels/level%03d.json" % id))
+  def change_number(rel)
+    return unless @editmode
+    @nummer = [@nummer+rel,1].max
+  end
+
+  def new_level(breite,hoehe)
+    @name = ""
+    @area = Array.new(hoehe) {Array.new(breite) }
+  end
+
+  def load_level
+    data = JSON.parse(File.read("levels/level%03d.json" % @nummer))
     @name = data['name']
     @area = data["karte"]
     @area.each {|row| row.each_index { |i| row[i] = row[i].to_sym if row[i]}}
@@ -240,11 +252,11 @@ class Level
   end
 
   def breite
-    @area.first.size
+    @area && @area.first ? @area.first.size : 0
   end
 
   def hoehe
-    @area.size
+    @area ? @area.size : 0
   end
 
 

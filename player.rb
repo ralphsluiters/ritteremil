@@ -163,7 +163,7 @@ class Player
   end
 
   def draw(scroll_x,scroll_y)
-    @items.draw(:ritter,@x,@y,scroll_x,scroll_y)
+    @items.draw(:hero,@x,@y,scroll_x,scroll_y)
   end
 
 
