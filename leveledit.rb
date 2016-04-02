@@ -1,17 +1,12 @@
 require 'gosu'
 
-module ZOrder
-  Background, Game, UI = *0..2
-end
-
 require_relative 'items'
 require_relative 'level'
 require_relative 'dialog'
 
 
 
-
-class GameWindow < Gosu::Window
+class LevelEditWindow < Gosu::Window
   attr_reader :selektion_x,:selektion_y
 
   def initialize(level_nummer)
@@ -258,14 +253,8 @@ class Position
     end
     @items.draw_on_position(:selection,@key_pos*32,20*32+40,ZOrder::UI)
   end
-
-
 end
 
-# print "Bitte Levelnummer eingeben:"
-# level_nummer = gets.to_i
-# unless File.exist?("levels/level%03d.json" % level_nummer)
-# end
 
-window = GameWindow.new(ARGV[0])
-window.show
+#window = LevelEditWindow.new(ARGV[0])
+#window.show

@@ -10,6 +10,8 @@ require_relative 'level'
 require_relative 'player'
 require_relative 'statusbar'
 require_relative 'dialog'
+require_relative 'leveledit'
+require_relative 'spielstand'
 
 
 
@@ -31,6 +33,7 @@ class GameWindow < Gosu::Window
     @statusleiste = Statusbar.new(@player,@items, @level,@settings)
     @dialog = Dialog.new(self)
     @state_machine = :spiel_start
+    @spieler_auswahl_position = 0
   end
 
   def update
@@ -42,7 +45,8 @@ class GameWindow < Gosu::Window
     else
       case @state_machine
       when :spiel_start
-        @state_machine = :level_start if Gosu::button_down? Gosu::KbSpace
+        @state_machine = :spieler_auswahl if Gosu::button_down? Gosu::KbSpace
+        sleep 0.2
       when :level_start
         @level = Level.new(@level_nummer,@items)
         @player = Player.new(@level,@items)
@@ -97,6 +101,28 @@ class GameWindow < Gosu::Window
         wait_time(2,:level_start)
       when :verloren
         wait_time(2,:level_start)
+      when :spieler_auswahl
+          if Gosu::button_down? Gosu::KbUp
+            @spieler_auswahl_position -=1
+            @spieler_auswahl_position =5 if @spieler_auswahl_position<0
+            sleep 0.2
+          end
+          if Gosu::button_down? Gosu::KbDown
+            @spieler_auswahl_position +=1
+            @spieler_auswahl_position =0 if @spieler_auswahl_position>5
+            sleep 0.2
+          end
+          if Gosu::button_down? Gosu::KbSpace
+            #spieler laden
+            if @spieler_auswahl_position==5
+              leveleditwindow = LevelEditWindow.new(ARGV[0])
+              leveleditwindow.show
+              close #own game window
+            else
+              # Spielstatus für spieler laden
+              @state_machine = :level_start
+            end
+          end
       end
     end
   end
@@ -119,6 +145,8 @@ class GameWindow < Gosu::Window
       @dialog.show("Gewonnen!")
     when :verloren
       @dialog.show("Leider verloren!",@player.comment)
+    when :spieler_auswahl
+      @dialog.show("Spielerauswahl",["Spieler 1","Spieler 2","Spieler 3","Spieler 4","Spieler 5","Leveleditor"][@spieler_auswahl_position])
     end
   end
 
