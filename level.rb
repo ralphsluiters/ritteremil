@@ -4,7 +4,6 @@ require 'json'
 require 'fileutils'
 
 class Level
-  attr_reader :area
   attr_reader :hero_start_position
   attr_reader :nummer
   attr_reader :name
@@ -69,11 +68,11 @@ class Level
 
 
   def try_push(x,y,direction, item)
-    if direction == :left && !@area[y][x-1]
+    if direction == :left && !value(x-1,y)
       @area[y][x-1]= item
       @area[y][x] = nil
       return true
-    elsif direction == :right && !@area[y][x+1]
+    elsif direction == :right && !value(x+1,y)
       @area[y][x+1]= item
       @area[y][x] = nil
       return true
@@ -84,7 +83,7 @@ class Level
   def draw(player)
     @area.each_index do |y|
       @area[y].each_index do |x|
-        @items.draw(@area[y][x],x,y,@scroll_x, @scroll_y)
+        @items.draw(value(x,y),x,y,@scroll_x, @scroll_y)
       end
     end
     player.draw(@scroll_x, @scroll_y)
@@ -117,57 +116,56 @@ class Level
     feuer_gefunden = false
     @area.each_index do |y|
       @area[y].each_index do |x|
-        if @area[y][x] == :feuer && (!feuer_gefunden) && Gosu.random(0,20)<1
-          if !@area[y-1][x]
+        if value(x,y) == :feuer && (!feuer_gefunden) && Gosu.random(0,20)<1
+          feuer_gefunden = true
+          if !value(x,y-1)
             area_new[y-1][x] = :feuer
-            feuer_gefunden = true
-          elsif !@area[y+1][x]
+          elsif !value(x,y+1)
             area_new[y+1][x] = :feuer
-            feuer_gefunden = true
-          elsif !@area[y][x-1]
+          elsif !value(x-1,y)
             area_new[y][x-1] = :feuer
-            feuer_gefunden = true
-          elsif !@area[y][x+1]
+          elsif !value(x+1,y)
             area_new[y][x+1] = :feuer
-            feuer_gefunden = true
+          else
+            feuer_gefunden = false
           end
-        elsif @area[y][x] == :explosion_bald
+        elsif value(x,y) == :explosion_bald
           area_new[y][x] = :explosion
           explosion(x,y,player,area_new)
-        elsif @area[y][x] == :explosion
+        elsif value(x,y) == :explosion
           area_new[y][x] = nil
-        elsif @area[y][x] == :blut
+        elsif value(x,y) == :blut
           area_new[y][x] = nil
-        elsif @area[y][x] == :fass
+        elsif value(x,y) == :fass
           if !@area[y+1][x] && (!player.on_position?(x,y+1))
             area_new[y][x] = nil
             area_new[y+1][x] = :fass_fallend
           end
-        elsif @area[y][x] == :fass_fallend
-          if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
+        elsif value(x,y) == :fass_fallend
+          if !value(x,y+1) && (!player.on_position?(x,y+1))
             area_new[y][x] = nil
             area_new[y+1][x] = :fass_fallend
           else
             explosion(x,y,player,area_new)
           end
-        elsif @area[y][x] == :stein
-          if @area[y+1][x] == nil && (!player.on_position?(x,y+1))
+        elsif value(x,y) == :stein
+          if !value(x,y+1) && (!player.on_position?(x,y+1))
             player.die!(:stein) if player.on_position?(x,y+2) && !player.helm
-            area_new[y+2][x] = :fass_fallend if @area[y+2][x] == :fass
-            area_new[y+2][x] = :blut if @area[y+2][x]== :ork && y<hoehe-1
-            area_new[y+2][x] = nil if @area[y+2][x]== :skelett && y<hoehe-1
+            area_new[y+2][x] = :fass_fallend if value(x,y+2) == :fass
+            area_new[y+2][x] = :blut if value(x,y+2)== :ork && y<hoehe-1
+            area_new[y+2][x] = nil if value(x,y+2)== :skelett && y<hoehe-1
             @items.play_sound(:stein)
             area_new[y][x] = nil
             area_new[y+1][x] = :stein
-          elsif @area[y+1][x] == :lava
+          elsif value(x,y+1) == :lava
             @items.play_sound(:stein)
             area_new[y][x] = nil
-          elsif @area[y+1][x] == :stein && !@area[y][x-1] && (!player.on_position?(x-1,y)) && !@area[y+1][x-1] && (!player.on_position?(x-1,y+1))
+          elsif value(x,y+1) == :stein && !value(x-1,y) && (!player.on_position?(x-1,y)) && !value(x-1,y+1) && (!player.on_position?(x-1,y+1))
             player.die!(:stein) if player.on_position?(x-1,y+2) && !player.helm
             @items.play_sound(:stein)
             area_new[y][x] = nil
             area_new[y+1][x-1] = :stein
-          elsif @area[y+1][x] == :stein && !@area[y][x+1] && (!player.on_position?(x+1,y)) && !@area[y+1][x+1] && (!player.on_position?(x+1,y+1))
+          elsif value(x,y+1) == :stein && !value(x+1,y) && (!player.on_position?(x+1,y)) && !value(x+1,y+1) && (!player.on_position?(x+1,y+1))
             player.die!(:stein) if player.on_position?(x+1,y+2) && !player.helm
             @items.play_sound(:stein)
             area_new[y][x] = nil
@@ -184,7 +182,7 @@ class Level
     @last_moved_enemy = Gosu::milliseconds
     @area.each_index do |y|
       @area[y].each_index do |x|
-        if @area[y][x] == :ork
+        if value(x,y) == :ork
           case Gosu.random(0,3).round
           when 0#up
             move_enemies_to(x,y,x,y-1,:ork, player)
@@ -195,7 +193,7 @@ class Level
           when 3#right
             move_enemies_to(x,y,x+1,y,:ork_bewegt, player)
           end
-        elsif @area[y][x] == :skelett
+        elsif value(x,y) == :skelett
           moved = false
           if player.x < x
             moved = true if move_enemies_to(x,y,x-1,y,:skelett, player)
@@ -209,9 +207,9 @@ class Level
               move_enemies_to(x,y,x,y+1,:skelett_bewegt, player)
             end
           end
-        elsif @area[y][x] == :ork_bewegt
+        elsif value(x,y) == :ork_bewegt
           @area[y][x] = :ork
-        elsif @area[y][x] == :skelett_bewegt
+        elsif value(x,y) == :skelett_bewegt
           @area[y][x] = :skelett
         end
       end
@@ -222,8 +220,8 @@ class Level
     ([y-1,0].max..[y+1,hoehe-1].min).each do |ii|
       ([x-1,0].max..[x+1,breite-1].min).each do |i|
         player.die!(:explosion) if player.on_position?(i,ii)
-        if ![:lava,:mauer, :explosion_bald].include?(@area[ii][i])
-          area_new[ii][i] = if [:fass,:fass_fallend].include?(@area[ii][i]) && !(y==ii && x==i)
+        if ![:lava,:mauer, :explosion_bald].include?(value(i,ii))
+          area_new[ii][i] = if [:fass,:fass_fallend].include?(value(i,ii)) && !(y==ii && x==i)
             :explosion_bald
           else
             :explosion
@@ -238,12 +236,11 @@ class Level
   end
 
   def clean_position(x,y)
-    @area[y][x] = nil
+    set_value(x,y,nil)
   end
 
   def set_position!(x,y,key) #only for level edit
-    return if x>=breite || y>=hoehe
-    @area[y][x] = key
+    set_value(x,y,key)
   end
 
 
@@ -262,6 +259,11 @@ class Level
 
 
 private
+
+  def set_value(x,y,key)
+    return if x<0 || y<0  || x >= breite || y>=hoehe
+    @area[y][x]=key
+  end
 
   def move_enemies_to(x,y,target_x,target_y, key, player)
     if !@area[target_y][target_x]

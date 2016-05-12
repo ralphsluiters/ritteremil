@@ -20,15 +20,14 @@ class GameWindow < Gosu::Window
   def initialize(level_nummer)
     super(32*25, 32*20+20)#, fullscreen: true )
     self.caption = "Ritter Emil"
-    @level_nummer = level_nummer.to_i>0 ? level_nummer.to_i : 1
     @settings = {sound_on: true, music_on: true}
-
+    @spielstand = Spielstand.new
     @background_image = Gosu::Image.new("media/boden.jpg", :tileable => true)
     @start_image = Gosu::Image.new("media/startbildschirm.jpg")
     @sounds = Sounds.new(@settings)
     @sounds.play_music
     @items = Items.new(@sounds)
-    @level = Level.new(@level_nummer,@items)
+    @level = Level.new(@spielstand.level,@items)
     @player = Player.new(@level,@items)
     @statusleiste = Statusbar.new(@player,@items, @level,@settings)
     @dialog = Dialog.new(self)
@@ -38,17 +37,19 @@ class GameWindow < Gosu::Window
 
   def update
     if @wait_end
-      if Gosu::milliseconds > @wait_end || Gosu::button_down?(Gosu::KbSpace)
+      if Gosu::milliseconds > @wait_end || Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
         @state_machine = @next_state
         @wait_end = nil
       end
     else
       case @state_machine
       when :spiel_start
-        @state_machine = :spieler_auswahl if Gosu::button_down? Gosu::KbSpace
-        sleep 0.2
+        if Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
+          @state_machine = :spieler_auswahl
+          sleep 0.5
+        end
       when :level_start
-        @level = Level.new(@level_nummer,@items)
+        @level = Level.new(@spielstand.level,@items)
         @player = Player.new(@level,@items)
         @statusleiste = Statusbar.new(@player,@items, @level,@settings)
         wait_time(2,:spielen)
@@ -69,19 +70,19 @@ class GameWindow < Gosu::Window
             sleep 0.2
           end
           direction = nil
-          if Gosu::button_down? Gosu::KbLeft or Gosu::button_down? Gosu::GpLeft then
+          if Gosu::button_down? Gosu::KbLeft
             direction = :left
             sleep 0.2
           end
-          if Gosu::button_down? Gosu::KbRight or Gosu::button_down? Gosu::GpRight then
+          if Gosu::button_down? Gosu::KbRight
             direction = :right
             sleep 0.2
           end
-          if Gosu::button_down? Gosu::KbUp or Gosu::button_down? Gosu::GpUp then
+          if Gosu::button_down? Gosu::KbUp
             direction = :up
             sleep 0.2
           end
-          if Gosu::button_down?(Gosu::KbDown) or Gosu::button_down? Gosu::GpDown then
+          if Gosu::button_down?(Gosu::KbDown)
             direction = :down
             sleep 0.2
           end
@@ -97,35 +98,43 @@ class GameWindow < Gosu::Window
           @state_machine = :spielen
         end
       when :gewonnen
-        @level_nummer += 1
+        @spielstand.next_level!
+        @spielstand.speichere_daten
         wait_time(2,:level_start)
       when :verloren
         wait_time(2,:level_start)
       when :spieler_auswahl
-          if Gosu::button_down? Gosu::KbUp
-            @spieler_auswahl_position -=1
-            @spieler_auswahl_position =5 if @spieler_auswahl_position<0
-            sleep 0.2
-          end
-          if Gosu::button_down? Gosu::KbDown
-            @spieler_auswahl_position +=1
-            @spieler_auswahl_position =0 if @spieler_auswahl_position>5
-            sleep 0.2
-          end
-          if Gosu::button_down? Gosu::KbSpace
-            #spieler laden
-            if @spieler_auswahl_position==5
-              leveleditwindow = LevelEditWindow.new(ARGV[0])
-              leveleditwindow.show
-              close #own game window
-            else
-              # Spielstatus für spieler laden
-              @state_machine = :level_start
-            end
-          end
+        update_spieler_auswahl
       end
     end
   end
+
+
+
+  def update_spieler_auswahl
+    if Gosu::button_down? Gosu::KbUp
+      @spieler_auswahl_position -=1
+      @spieler_auswahl_position =5 if @spieler_auswahl_position<0
+      sleep 0.2
+    end
+    if Gosu::button_down? Gosu::KbDown
+      @spieler_auswahl_position +=1
+      @spieler_auswahl_position =0 if @spieler_auswahl_position>5
+      sleep 0.2
+    end
+    if Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
+      #spieler laden
+      if @spieler_auswahl_position==5
+        leveleditwindow = LevelEditWindow.new(ARGV[0])
+        leveleditwindow.show
+        close #own game window
+      else
+        @spielstand.spieler_wechsel!(@spieler_auswahl_position)
+        @state_machine = :level_start
+      end
+    end
+  end
+
 
   def draw
     case @state_machine
@@ -133,7 +142,7 @@ class GameWindow < Gosu::Window
       Gosu::draw_rect(0, 0, width, height, 0x8f_ffffff, ZOrder::UI, :additive)
       @start_image.draw(0, 50, ZOrder::UI,0.6,0.6)
     when :level_start
-      @dialog.show("Level #{@level_nummer}: #{@level.name}",@level.tipp)
+      @dialog.show("Level #{@spielstand.level}: #{@level.name}",@level.tipp)
 
     when :spielen
       @background_image.draw(0, 0, ZOrder::Background)
@@ -146,7 +155,7 @@ class GameWindow < Gosu::Window
     when :verloren
       @dialog.show("Leider verloren!",@player.comment)
     when :spieler_auswahl
-      @dialog.show("Spielerauswahl",["Spieler 1","Spieler 2","Spieler 3","Spieler 4","Spieler 5","Leveleditor"][@spieler_auswahl_position])
+      @dialog.show_list("Spielerauswahl",(@spielstand.spielerliste + ["Leveleditor"]),@spieler_auswahl_position)
     end
   end
 

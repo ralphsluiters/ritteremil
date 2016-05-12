@@ -49,7 +49,7 @@ class LevelEditWindow < Gosu::Window
           else
             @position.move(@position.x-1,@position.y)
           end
-          sleep 0.2
+          sleep 0.08
         end
         if Gosu::button_down? Gosu::KbRight
           if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift))
@@ -57,7 +57,7 @@ class LevelEditWindow < Gosu::Window
           else
             @position.move(@position.x+1,@position.y)
           end
-          sleep 0.2
+          sleep 0.08
         end
         if Gosu::button_down? Gosu::KbUp
           if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift)) && @position.sel_y > 1
@@ -65,7 +65,7 @@ class LevelEditWindow < Gosu::Window
           else
             @position.move(@position.x,@position.y-1)
           end
-          sleep 0.2
+          sleep 0.08
         end
         if Gosu::button_down?(Gosu::KbDown)
           if (Gosu::button_down?(Gosu::KbLeftShift) || Gosu::button_down?(Gosu::KbRightShift))
@@ -73,16 +73,16 @@ class LevelEditWindow < Gosu::Window
           else
             @position.move(@position.x,@position.y+1)
           end
-          sleep 0.2
+          sleep 0.08
         end
 
         if Gosu::button_down?(Gosu::KbX)
           @position.move_key(@position.key_pos-1)
-          sleep 0.2
+          sleep 0.08
         end
         if Gosu::button_down?(Gosu::KbC)
           @position.move_key(@position.key_pos+1)
-          sleep 0.2
+          sleep 0.08
         end
         if Gosu::button_down?(Gosu::KbSpace)
           (0...@position.sel_y).each do |ii|
@@ -90,7 +90,7 @@ class LevelEditWindow < Gosu::Window
               @level.set_position!(@position.x+i,@position.y+ii,@position.key)
             end
           end
-          sleep 0.2
+          sleep 0.02
         end
         if Gosu::button_down?(Gosu::KbN)
           @new_level_width=25

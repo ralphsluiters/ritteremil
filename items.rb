@@ -3,6 +3,7 @@ require 'gosu'
 class Items
   TYPES = {
     erde: {file: 'mud.jpeg' },
+#    erde: {file: 'earth.jpeg' },
     mauer: {file: 'wall.png' },
     stein: {file: 'rock.png' },
     fass: {file: 'pulverfass.gif'},
