@@ -18,7 +18,7 @@ class Spielstand
   def speichere_daten
     @data["spieler"][@aktiver_spieler]["level"] = @level
     File.open("spielstand/spielstand.json","w") do |f|
-      f.write(data.to_json)
+      f.write(@data.to_json)
     end
   end
 
