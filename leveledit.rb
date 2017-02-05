@@ -9,24 +9,16 @@ require_relative 'dialog'
 class LevelEditWindow < Gosu::Window
   attr_reader :selektion_x,:selektion_y
 
-  def initialize(level_nummer)
+  def initialize()
     super(32*25+20, 32*20+20+20+32+20)#, fullscreen: true )
     self.caption = "Ritter Emil - Leveleditor"
     @background_image = Gosu::Image.new("media/boden.jpg", :tileable => true)
     @items = Items.new(nil)
     @new_level_width = 25
     @new_level_height = 20
-    if level_nummer.to_i>0 #given level as parameter
-      @level_nummer = level_nummer.to_i
-      @level = Level.new(@level_nummer,@items,true)
-      @level.load_level
-      @level.scroll_to(0,0)
-      @state_machine = :level_edit_start
-    else
-      @level_nummer = 1
-      @level = Level.new(@level_nummer,@items,true)
-      @state_machine = :new_game
-    end
+    @level_nummer = 1
+    @level = Level.new(@level_nummer,@items,true)
+    @state_machine = :load_game
     @dialog = Dialog.new(self)
     @position = Position.new(@items, @level)
     @font_small = Gosu::Font.new(20)
@@ -108,65 +100,69 @@ class LevelEditWindow < Gosu::Window
       when :save_game
         if Gosu::button_down? Gosu::KbLeft
           @level.change_number(-1)
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down? Gosu::KbRight
           @level.change_number(+1)
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
           @level.save_level
           @state_machine = :level_edit
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEscape)
           @state_machine = :level_edit
-          sleep 0.2
+          sleep 0.1
         end
       when :new_game
         if Gosu::button_down? Gosu::KbLeft
           @new_level_width -=1 if @new_level_width >3
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down? Gosu::KbRight
           @new_level_width +=1 if @new_level_width <500
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down? Gosu::KbUp
           @new_level_height -=1 if @new_level_height >3
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbDown)
           @new_level_height +=1 if @new_level_height <500
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
           @level.new_level(@new_level_width,@new_level_height)
           @state_machine = :level_edit_start
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEscape)
           @state_machine = :level_edit
-          sleep 0.2
+          sleep 0.1
         end
 
       when :load_game
         if Gosu::button_down? Gosu::KbLeft
           @level.change_number(-1)
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down? Gosu::KbRight
           @level.change_number(+1)
-          sleep 0.2
+          sleep 0.1
+        end
+        if Gosu::button_down? Gosu::KbN
+          @state_machine = :new_game
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
           @level.load_level
           @state_machine = :level_edit
-          sleep 0.2
+          sleep 0.1
         end
         if Gosu::button_down?(Gosu::KbEscape)
           @state_machine = :level_edit
-          sleep 0.2
+          sleep 0.1
         end
       end
 
@@ -185,9 +181,9 @@ class LevelEditWindow < Gosu::Window
       when :new_game
         @dialog.show("Neues Level","Größe: #{@new_level_width}x#{@new_level_height}\nGröße mit Pfeiltasten ändern\nENTER zum Erstellen\nESC zum Abbrechen")
       when :load_game
-        @dialog.show("Laden!","Level #{@level.nummer}\nPfeile um Levelnummer zu ändern\nENTER zum Laden\nESC zum Abbrechen")
+        @dialog.show("Laden!","Level #{@level.nummer}\n<-/-> um Levelnummer zu ändern\n\"N\" für neues Level\nENTER zum Laden\nESC zum Abbrechen")
       when :save_game
-        @dialog.show("Speichern!","Level #{@level.nummer}\nPfeile um Levelnummer zu ändern\nENTER zum Speichern\nESC zum Abbrechen")
+        @dialog.show("Speichern!","Level #{@level.nummer}\n<-/-> um Levelnummer zu ändern\nENTER zum Speichern\nESC zum Abbrechen")
       when :level_edit_start
         @dialog.show("Leveleditor!","X/C zum Wechseln der Items\nS zum Speichern\nL zum Laden\nN für neues Level\nQ zum Beenden")
       end

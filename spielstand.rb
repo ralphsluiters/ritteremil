@@ -23,7 +23,7 @@ class Spielstand
   end
 
   def spielerliste
-    @data["spieler"].map {|item| item["name"]}
+    @data["spieler"].map {|item| "#{item["name"]} (Level: #{item["level"]})"}
   end
 
   def next_level

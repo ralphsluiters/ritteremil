@@ -125,7 +125,7 @@ class GameWindow < Gosu::Window
     if Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
       #spieler laden
       if @spieler_auswahl_position==5
-        leveleditwindow = LevelEditWindow.new(ARGV[0])
+        leveleditwindow = LevelEditWindow.new()
         leveleditwindow.show
         close #own game window
       else
