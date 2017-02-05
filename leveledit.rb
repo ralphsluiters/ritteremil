@@ -179,9 +179,9 @@ class LevelEditWindow < Gosu::Window
         @level.draw(@position)
         draw_items
         @font_small.draw("Level: #{@level.nummer}  | Größe: #{@level.breite}x#{@level.hoehe}  |  Q zum Beenden", 10, 0, ZOrder::UI,1,1,0xff_000000)
-        @font_small.draw(@position.key || "Leer", 10, 20*32+20+20+32, ZOrder::UI,1,1,0xff_000000)
-        (0..[19,@level.hoehe].min).each {|y| @font_small.draw(y+@level.scroll_y+1,25*32+1, 20+6+y*32, ZOrder::UI,1,1,0xff_000000)}
-        (0..[24,@level.breite].min).each {|x| @font_small.draw(x+@level.scroll_x+1,6+x*32, 20*32+22, ZOrder::UI,1,1,0xff_000000)}
+        @font_small.draw((@position.key || "Leer").to_s, 10, 20*32+20+20+32, ZOrder::UI,1,1,0xff_000000)
+        (0..[19,@level.hoehe].min).each {|y| @font_small.draw((y+@level.scroll_y+1).to_s,25*32+1, 20+6+y*32, ZOrder::UI,1,1,0xff_000000)}
+        (0..[24,@level.breite].min).each {|x| @font_small.draw((x+@level.scroll_x+1).to_s,6+x*32, 20*32+22, ZOrder::UI,1,1,0xff_000000)}
       when :new_game
         @dialog.show("Neues Level","Größe: #{@new_level_width}x#{@new_level_height}\nGröße mit Pfeiltasten ändern\nENTER zum Erstellen\nESC zum Abbrechen")
       when :load_game
