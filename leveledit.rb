@@ -192,6 +192,8 @@ class LevelEditWindow < Gosu::Window
 
   def button_down(id)
     if id == Gosu::KbQ
+      window = GameWindow.new(ARGV[0])
+      window.show
       close
     end
 

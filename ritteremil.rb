@@ -114,12 +114,12 @@ class GameWindow < Gosu::Window
   def update_spieler_auswahl
     if Gosu::button_down? Gosu::KbUp
       @spieler_auswahl_position -=1
-      @spieler_auswahl_position =5 if @spieler_auswahl_position<0
+      @spieler_auswahl_position =6 if @spieler_auswahl_position<0
       sleep 0.2
     end
     if Gosu::button_down? Gosu::KbDown
       @spieler_auswahl_position +=1
-      @spieler_auswahl_position =0 if @spieler_auswahl_position>5
+      @spieler_auswahl_position =0 if @spieler_auswahl_position>6
       sleep 0.2
     end
     if Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
@@ -128,6 +128,8 @@ class GameWindow < Gosu::Window
         leveleditwindow = LevelEditWindow.new()
         leveleditwindow.show
         close #own game window
+      elsif @spieler_auswahl_position==6
+        close
       else
         @spielstand.spieler_wechsel!(@spieler_auswahl_position)
         @state_machine = :level_start
@@ -155,7 +157,7 @@ class GameWindow < Gosu::Window
     when :verloren
       @dialog.show("Leider verloren!",@player.comment)
     when :spieler_auswahl
-      @dialog.show_list("Spielerauswahl",(@spielstand.spielerliste + ["Leveleditor"]),@spieler_auswahl_position)
+      @dialog.show_list("Spielerauswahl",(@spielstand.spielerliste + ["Leveleditor","Beenden"]),@spieler_auswahl_position)
     end
   end
 
