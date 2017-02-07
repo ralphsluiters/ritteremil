@@ -6,8 +6,33 @@ require_relative 'dialog'
 
 
 
+
 class LevelEditWindow < Gosu::Window
   attr_reader :selektion_x,:selektion_y
+
+
+  def fill_area
+    old_value = @level.value(@position.x,@position.y)
+    @level.set_position!(@position.x,@position.y,:filled_area)
+    found = true
+    while (found)
+      found = false
+      (0..@level.hoehe-1).each do |y| 
+        (0..@level.breite-1).each do |x|
+          if @level.value(x,y) == old_value && (@level.value([0,x-1].max,y)==:filled_area || @level.value([@level.breite-1,x+1].min,y)==:filled_area || @level.value(x,[0,y-1].max)==:filled_area || @level.value(x,[@level.hoehe-1,y+1].min)==:filled_area) 
+            found = true
+            @level.set_position!(x,y,:filled_area)
+          end#if
+        end
+      end      
+    end
+
+    (0..@level.hoehe-1).each do |y| 
+      (0..@level.breite-1).each do|x|
+        @level.set_position!(x,y,@position.key) if @level.value(x,y) == :filled_area
+      end
+    end      
+  end
 
   def initialize()
     super(32*25+20, 32*20+20+20+32+20)#, fullscreen: true )
@@ -95,6 +120,11 @@ class LevelEditWindow < Gosu::Window
         if Gosu::button_down?(Gosu::KbL)
           @state_machine = :load_game
         end
+        if Gosu::button_down?(Gosu::KbF)
+          fill_area
+          sleep 1
+        end
+
       when :level_edit_start
         wait_time(2,:level_edit)
       when :save_game
@@ -185,7 +215,7 @@ class LevelEditWindow < Gosu::Window
       when :save_game
         @dialog.show("Speichern!","Level #{@level.nummer}\n<-/-> um Levelnummer zu ändern\nENTER zum Speichern\nESC zum Abbrechen")
       when :level_edit_start
-        @dialog.show("Leveleditor!","X/C zum Wechseln der Items\nS zum Speichern\nL zum Laden\nN für neues Level\nQ zum Beenden")
+        @dialog.show("Leveleditor!","X/C zum Wechseln der Items\nF zum Füllen\nS zum Speichern\nL zum Laden\nN für neues Level\nQ zum Beenden")
       end
     end
   end
