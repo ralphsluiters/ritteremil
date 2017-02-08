@@ -124,7 +124,15 @@ class Level
       @area[y].each_index do |x|
         if value(x,y) == :feuer && (!feuer_gefunden) && Gosu.random(0,20)<1
           feuer_gefunden = true
-          if !value(x,y-1)
+          if value(x,y-1) == :fass
+            area_new[y-1][x] = :fass_fallend
+          elsif value(x,y+1) == :fass
+            area_new[y+1][x] = :fass_fallend
+          elsif value(x-1,y) == :fass
+            area_new[y][x-1] = :fass_fallend
+          elsif value(x+1,y) == :fass
+            area_new[y][x+1] = :fass_fallend
+          elsif !value(x,y-1)
             area_new[y-1][x] = :feuer
           elsif !value(x,y+1)
             area_new[y+1][x] = :feuer
@@ -254,6 +262,7 @@ class Level
     return :levelende if x<0 || y<0 || x>=breite || y>=hoehe
     @area[y][x]
   end
+
 
   def breite
     @area && @area.first ? @area.first.size : 0
