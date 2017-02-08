@@ -266,6 +266,7 @@ private
   end
 
   def move_enemies_to(x,y,target_x,target_y, key, player)
+    return false if target_x >=breite || target_y >=hoehe 
     if !@area[target_y][target_x]
       if player.on_position?(target_x,target_y)
         player.attacked(key)
