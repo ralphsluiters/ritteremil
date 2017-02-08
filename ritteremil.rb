@@ -60,6 +60,9 @@ class GameWindow < Gosu::Window
           @state_machine = :pause
           sleep 0.5
         else
+          if Gosu::button_down?(Gosu::KbEscape) || Gosu::button_down?(Gosu::KbQ)
+            @state_machine = :verloren
+          end
           if Gosu::button_down? Gosu::KbM
             @settings[:music_on]= !@settings[:music_on]
 
@@ -72,19 +75,19 @@ class GameWindow < Gosu::Window
           direction = nil
           if Gosu::button_down? Gosu::KbLeft
             direction = :left
-            sleep 0.2
+            sleep 0.1
           end
           if Gosu::button_down? Gosu::KbRight
             direction = :right
-            sleep 0.2
+            sleep 0.1
           end
           if Gosu::button_down? Gosu::KbUp
             direction = :up
-            sleep 0.2
+            sleep 0.1
           end
           if Gosu::button_down?(Gosu::KbDown)
             direction = :down
-            sleep 0.2
+            sleep 0.1
           end
 
           @player.try_move(direction)
@@ -115,6 +118,9 @@ class GameWindow < Gosu::Window
 
 
   def update_spieler_auswahl
+    if Gosu::button_down?(Gosu::KbEscape) || Gosu::button_down?(Gosu::KbQ)
+      close
+    end
     if Gosu::button_down? Gosu::KbUp
       @spieler_auswahl_position -=1
       @spieler_auswahl_position =6 if @spieler_auswahl_position<0
@@ -144,6 +150,10 @@ class GameWindow < Gosu::Window
 
 
   def update_level_auswahl
+    if Gosu::button_down?(Gosu::KbEscape) || Gosu::button_down?(Gosu::KbQ)
+      @state_machine = :spieler_auswahl
+      sleep 0.2
+    end
     if Gosu::button_down? Gosu::KbUp
       @level_auswahl_position -=1
       @level_auswahl_position =@spielstand.level-1 if @level_auswahl_position<0
@@ -181,15 +191,10 @@ class GameWindow < Gosu::Window
     when :spieler_auswahl
       @dialog.show_list("Spielerauswahl",(@spielstand.spielerliste + ["Leveleditor","Beenden"]),@spieler_auswahl_position)
     when :level_auswahl
-      @dialog.show_list("Levelauswahl",(1..@spielstand.level).to_a,@level_auswahl_position )
+      @dialog.show_list("Levelauswahl",(1..@spielstand.level).to_a.map{|i| "Level #{i}: #{i<@spielstand.level ? "geschafft" : "aktuell"}"},@level_auswahl_position )
     end
   end
 
-  def button_down(id)
-    if id == Gosu::KbEscape || id == Gosu::KbQ
-      close
-    end
-  end
 
 private
   def wait_time(seconds,next_state)

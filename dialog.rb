@@ -21,8 +21,16 @@ class Dialog
   end
 
   def show_list(text,list,selected_index=nil)
-    show(text,list.join("\n"))
-    @font_small.draw(">", 160, 270+selected_index*20, ZOrder::UI, 1.0, 1.0, 0xff_493D26)
+    start = 0; shortlist=nil
+    if list.size > 8 
+      start = [[selected_index-4,list.size-8].min,0].max
+      shortlist = list.slice(start,8)
+    else
+      shortlist = list
+      start=0
+    end
+    show(text,shortlist.join("\n"))
+    @font_small.draw(">", 160, 270+(selected_index-start)*20, ZOrder::UI, 1.0, 1.0, 0xff_493D26)
   end
 
 end
