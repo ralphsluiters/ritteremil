@@ -26,8 +26,8 @@ class Spielstand
     @data["spieler"].map {|item| "#{item["name"]} (Level: #{item["level"]})"}
   end
 
-  def next_level
-    @level +=1
+  def next_level(played_level)
+    @level +=1 unless played_level < @level
   end
 
 

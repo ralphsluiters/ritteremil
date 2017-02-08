@@ -49,7 +49,7 @@ class GameWindow < Gosu::Window
           sleep 0.5
         end
       when :level_start
-        @level = Level.new(@spielstand.level,@items)
+        @level = Level.new(@level_auswahl_position+1,@items)
         @player = Player.new(@level,@items)
         @statusleiste = Statusbar.new(@player,@items, @level,@settings)
         wait_time(2,:spielen)
@@ -98,13 +98,16 @@ class GameWindow < Gosu::Window
           @state_machine = :spielen
         end
       when :gewonnen
-        @spielstand.next_level
+        @spielstand.next_level(@level_auswahl_position+1)
         @spielstand.speichere_daten
-        wait_time(2,:level_start)
+        @level_auswahl_position +=1 
+        wait_time(2,:level_auswahl)
       when :verloren
-        wait_time(2,:level_start)
+        wait_time(2,:level_auswahl)
       when :spieler_auswahl
         update_spieler_auswahl
+      when :level_auswahl
+        update_level_auswahl
       end
     end
   end
@@ -132,11 +135,30 @@ class GameWindow < Gosu::Window
         close
       else
         @spielstand.spieler_wechsel!(@spieler_auswahl_position)
-        @state_machine = :level_start
+        @level_auswahl_position = @spielstand.level-1
+        @state_machine = :level_auswahl
+        sleep 0.2
       end
     end
   end
 
+
+  def update_level_auswahl
+    if Gosu::button_down? Gosu::KbUp
+      @level_auswahl_position -=1
+      @level_auswahl_position =@spielstand.level-1 if @level_auswahl_position<0
+      sleep 0.2
+    end
+    if Gosu::button_down? Gosu::KbDown
+      @level_auswahl_position +=1
+      @level_auswahl_position =0 if @level_auswahl_position>@spielstand.level-1
+      sleep 0.2
+    end
+    if Gosu::button_down?(Gosu::KbSpace) || Gosu::button_down?(Gosu::KbEnter) || Gosu::button_down?(40)
+      
+      @state_machine = :level_start
+    end
+  end
 
   def draw
     case @state_machine
@@ -144,7 +166,7 @@ class GameWindow < Gosu::Window
       Gosu::draw_rect(0, 0, width, height, 0x8f_ffffff, ZOrder::UI, :additive)
       @start_image.draw(0, 50, ZOrder::UI,0.6,0.6)
     when :level_start
-      @dialog.show("Level #{@spielstand.level}: #{@level.name}",@level.tipp)
+      @dialog.show("Level #{@level.nummer}: #{@level.name}",@level.tipp)
 
     when :spielen
       @background_image.draw(0, 0, ZOrder::Background)
@@ -158,6 +180,8 @@ class GameWindow < Gosu::Window
       @dialog.show("Leider verloren!",@player.comment)
     when :spieler_auswahl
       @dialog.show_list("Spielerauswahl",(@spielstand.spielerliste + ["Leveleditor","Beenden"]),@spieler_auswahl_position)
+    when :level_auswahl
+      @dialog.show_list("Levelauswahl",(1..@spielstand.level).to_a,@level_auswahl_position )
     end
   end
 
