@@ -19,7 +19,13 @@ class Level
            "Feuer breitet sich aus.",
            "Orks wissen nie, wo sie hinlaufen.",
            "Skelette laufen immer zum Held.",
-           "Die Burg ist das Ziel."]
+           "Die Burg ist das Ziel.",
+           "Steine fallen seitlich von Steinen.",
+           "Steine und Fässer kann man schieben.",
+           "Fässer explodieren beim Aufprall.",
+           "Fässer explodieren, wenn Steine auf sie fallen.",
+           "Orks mögen keine fallenden Steine.",
+           "Steine versinken in Lava."]
 
 
   def initialize(nummer,items,editmode = false)
