@@ -12,6 +12,7 @@ class Items
     feuer: {file: 'feuer.png'},
     ork: {file: 'ork.png'},
     skelett: {file: 'skeleton.png'},
+    drache: {file: 'dragon.gif'},
     btuer: {file: 'door_blue.png'},
     bkey: {file: 'key_blue.png'},
     schatz: {file: 'treasure.png'},

@@ -76,6 +76,15 @@ class Player
       else
         die!(:skelett)
       end
+    when :drache
+      if @waffen > 1
+        move(x,y)
+        @level.add_animation(:axt,x,y, false)
+        @level.add_animation(:axt,x,y, false)
+        @waffen -=2
+      else
+        die!(:drache)
+      end
     when :btuer
       if @schluessel_blau > 0
         move(x,y)

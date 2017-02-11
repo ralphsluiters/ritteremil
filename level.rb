@@ -25,7 +25,10 @@ class Level
            "Fässer explodieren beim Aufprall.",
            "Fässer explodieren, wenn Steine auf sie fallen.",
            "Orks mögen keine fallenden Steine.",
-           "Steine versinken in Lava."]
+           "Steine versinken in Lava.",
+           "Drachen können durch Feuer laufen.",
+           "Drachen speien Feuer.",
+           "Man braucht zwei Äxte für einen Drachen."]
 
 
   def initialize(nummer,items,editmode = false)
@@ -207,6 +210,25 @@ class Level
           when 3#right
             move_enemies_to(x,y,x+1,y,:ork_bewegt, player)
           end
+        elsif value(x,y) == :drache
+          case Gosu.random(0,11).round
+          when 0,8#up
+            move_enemies_to(x,y,x,y-1,:drache, player)
+          when 1,9#down
+            move_enemies_to(x,y,x,y+1,:drache_bewegt, player)
+          when 2,10#left
+            move_enemies_to(x,y,x-1,y,:drache, player)
+          when 3,11#right
+            move_enemies_to(x,y,x+1,y,:drache_bewegt, player)
+          when 4#fireup
+            @area[y-1][x] ||= :feuer 
+          when 5#firedown
+            @area[y+1][x] ||= :feuer 
+          when 6#fireleft
+            @area[y][x-1] ||= :feuer 
+          when 7#fireright
+            @area[y][x+1] ||= :feuer 
+          end
         elsif value(x,y) == :skelett
           moved = false
           if player.x < x
@@ -223,6 +245,8 @@ class Level
           end
         elsif value(x,y) == :ork_bewegt
           @area[y][x] = :ork
+        elsif value(x,y) == :drache_bewegt
+          @area[y][x] = :drache
         elsif value(x,y) == :skelett_bewegt
           @area[y][x] = :skelett
         end
@@ -282,7 +306,7 @@ private
 
   def move_enemies_to(x,y,target_x,target_y, key, player)
     return false if target_x >=breite || target_y >=hoehe 
-    if !@area[target_y][target_x]
+    if !@area[target_y][target_x] || (@area[target_y][target_x]==:feuer && (key ==:drache || key == :drache_bewegt))
       if player.on_position?(target_x,target_y)
         player.attacked(key)
       else
