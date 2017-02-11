@@ -51,6 +51,8 @@ class Player
       @items.play_sound(:wall)
     when :mauer
       @items.play_sound(:wall)
+    when :mauerk
+      @items.play_sound(:wall)
     when :burg
       @items.play_sound(:ziel)
       @gewonnen = true

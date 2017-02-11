@@ -5,6 +5,7 @@ class Items
     erde: {file: 'mud.jpeg' },
 #    erde: {file: 'earth.jpeg' },
     mauer: {file: 'wall.png' },
+    mauerk: {file: 'brickwall.jpg' },
     stein: {file: 'rock.png' },
     fass: {file: 'pulverfass.gif'},
     lava: {file: 'lava_tiles.png', animated: 30},
