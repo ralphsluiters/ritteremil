@@ -53,7 +53,12 @@ class Items
   def draw(key, x, y, scroll_x, scroll_y)
     if key
       if (x-scroll_x >= 0) && (x-scroll_x < 25) && (y-scroll_y >= 0) && (y-scroll_y < 20)
-        draw_on_position(key, (x-scroll_x)*32, (y-scroll_y)*32+20)
+        rotation=if [:lava,:erde,:bkey,:axt,:glove,:explosion].include?(key)
+                 ((x+y) % 4)*90 
+                 else 
+                  0
+                 end
+        draw_on_position(key, (x-scroll_x)*32, (y-scroll_y)*32+20,ZOrder::Game,1,rotation)
       end
     end
   end
@@ -100,7 +105,7 @@ class Animation
   def move
     if @y > 10
       @scale = ((@start_y/2.0)/@y)
-      @y -=5
+      @y -=10
       false
     else
       true
