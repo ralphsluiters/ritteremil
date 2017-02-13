@@ -58,7 +58,7 @@ class Level
   end
 
   def load_level
-    data = JSON.parse(File.read("levels/level%03d.json" % @nummer))
+    data = read_level_data_from_file
     @name = data['name']
     @area = data["karte"]
     @area.each {|row| row.each_index { |i| row[i] = row[i].to_sym if row[i]}}
@@ -298,6 +298,13 @@ class Level
 
 
 private
+
+  def read_level_data_from_file
+    JSON.parse(File.read("levels/level%03d.json" % @nummer))
+  rescue
+    JSON.parse(File.read("levels/level001.json"))
+  end
+
 
   def set_value(x,y,key)
     return if x<0 || y<0  || x >= breite || y>=hoehe

@@ -66,10 +66,15 @@ class Items
     end
   end
 
-  def draw_on_position(key,x,y, z = ZOrder::Game, scale = 1)
+  def draw_on_position(key,x,y, z = ZOrder::Game, scale = 1, rotation = 0)
     image = @images[key]
     image = image[Gosu::milliseconds / 100 % image.size] if image.class == Array
-    image.draw(x, y, z,scale,scale)
+    
+    if rotation == 0
+      image.draw(x, y, z,scale,scale)
+    else
+      image.draw_rot(x+16, y+16, z, rotation, 0.5, 0.5, scale, scale)
+    end
   end
 
   def self.drawable_items
