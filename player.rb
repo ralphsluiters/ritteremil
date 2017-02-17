@@ -169,6 +169,7 @@ class Player
       die!(enemy)
     end
   end
+  
   def comment
     VERLOREN_TEXTE[verloren] if verloren
   end

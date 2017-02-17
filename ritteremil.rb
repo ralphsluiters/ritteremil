@@ -101,7 +101,7 @@ class GameWindow < Gosu::Window
           @state_machine = :spielen
         end
       when :gewonnen
-        @spielstand.next_level(@level_auswahl_position+1)
+        @spielstand.next_level(@level_auswahl_position+1,@player.score)
         @spielstand.speichere_daten
         @level_auswahl_position +=1 
         wait_time(2,:level_auswahl)

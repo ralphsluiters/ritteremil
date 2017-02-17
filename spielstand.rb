@@ -2,6 +2,7 @@ require 'json'
 
 class Spielstand
   attr_reader :level
+  attr_reader :money
 
   def initialize
 
@@ -17,6 +18,7 @@ class Spielstand
 
   def speichere_daten
     @data["spieler"][@aktiver_spieler]["level"] = @level
+    @data["spieler"][@aktiver_spieler]["money"] = @money
     File.open("spielstand/spielstand.json","w") do |f|
       f.write(@data.to_json)
     end
@@ -26,8 +28,11 @@ class Spielstand
     @data["spieler"].map {|item| "#{item["name"]} (Level: #{item["level"]})"}
   end
 
-  def next_level(played_level)
-    @level +=1 unless played_level < @level
+  def next_level(played_level,score=0)
+    unless played_level < @level
+      @level +=1 
+      @money +=score
+    end 
   end
 
 
